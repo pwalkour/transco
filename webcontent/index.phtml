@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Transco : ajouter une sla</title>
+<link rel="stylesheet" href="styles/main_transco_style.css" />
+</head>
+<body>
+data
+	<?php
+	echo "<hr><br>";
+	$host="127.0.0.1:8889";
+	$user="root";
+	$password="pwalkour12";
+	$base="transco";
+	echo "->".$host."<hr><br>";
+	echo "-".$user."<hr><br>";
+	echo "-".$password."<hr><br>";
+	echo "-".$base."<hr><br>";
+	
+	$connection = mysql_connect($host,$user,$password);
+	if (!$connection) {
+		die('Could not connect: ' . mysql_error());
+	}
+	
+	mysql_select_db($base,$connection);
+	
+
+	$request="select * from sla;";
+	echo "-".$request."<hr><br>";
+	$results=mysql_query($request);
+	echo "-> >".$results."<hr><br>";
+	
+	if (!$results) {
+		die('Query failed: ' . mysql_error());
+	}
+	/* get column metadata */
+
+	$i = 0;
+	while ($i < mysql_num_fields($results)) {
+		echo "Information for column $i:<br />\n";
+		$meta = mysql_fetch_field($results, $i);
+		if (!$meta) {
+		
+		}
+		echo "<pre>
+		blob:         $meta->blob
+		max_length:   $meta->max_length
+		multiple_key: $meta->multiple_key
+		name:         $meta->name
+		not_null:     $meta->not_null
+		numeric:      $meta->numeric
+		primary_key:  $meta->primary_key
+		table:        $meta->table
+		type:         $meta->type
+		unique_key:   $meta->unique_key
+		unsigned:     $meta->unsigned
+		zerofill:     $meta->zerofill
+		</pre>";
+		$i++;
+	}
+
+	while ($a_row=mysql_fetch_array($results) )
+		echo "record:[".$a_row['id_sla']."],[".$a_row['effdt']."],[".$a_row['serial']."],[".$a_row['sla_name_fr']."],[".$a_row['sla_name_uk']."],[".$a_row['is_used']."]<br>";
+	mysql_free_result($results);
+	
+	$request="select * from sla where effdt='2013-01-28' and serial=(select max(serial) from sla where effdt='2013-01-28');";
+	echo "-".$request."<hr><br>";
+	$results=mysql_query($request);
+	echo "-> >".$results."<hr><br>";
+	
+	if (!$results) {
+		die('Query failed: ' . mysql_error());
+	}
+	while ($a_row=mysql_fetch_array($results) )
+		echo "record:[".$a_row['id_sla']."],[".$a_row['effdt']."],[".$a_row['serial']."],[".$a_row['sla_name_fr']."],[".$a_row['sla_name_uk']."],[".$a_row['is_used']."]<br>";
+	mysql_free_result($results);
+	?>
+</body>
+</html>

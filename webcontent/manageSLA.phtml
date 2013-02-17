@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Transco : ajouter une sla</title>
+<link rel="stylesheet" href="styles/main_transco_style.css" />
+<script>
+function getOneElementTable(aReference,aKey)
+{
+	$returnStr="";
+	 xx=aReference.getElementsByTagName(aKey);
+     {
+     try
+       {
+    	 $returnStr= "<td>" + xx[0].firstChild.nodeValue + "</td>";
+       }
+     catch (er)
+       {
+    	 $returnStr = "<td>&nbsp;</td>";
+       }
+     }
+     return $returnStr;
+}
+function getOneElementData(aReference,aKey)
+{
+	$returnStr="";
+	 xx=aReference.getElementsByTagName(aKey);
+     {
+     try
+       {
+    	 $returnStr= xx[0].firstChild.nodeValue ;
+       }
+     catch (er)
+       {
+    	 $returnStr = "-?-";
+       }
+     }
+     return $returnStr;
+}
+
+
+function getSlaDailyData(aDate,aNavigate)
+{
+
+var url="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
+//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
+var xmlhttp;
+var x,name_fr,name_uk,is_used;
+document.getElementById('tutu').value=url;
+//alert(aDate);
+
+if (window.XMLHttpRequest)
+  {// code for IE7+, Firefox, Chrome, Opera, Safari 
+  xmlhttp=new XMLHttpRequest();
+  }
+else
+  {// code for IE6, IE5 
+  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+xmlhttp.onreadystatechange=function()
+{
+if (xmlhttp.readyState==4 && xmlhttp.status==200)
+  {
+  txt="<table border='1'>";
+  txt=txt+"<tr>";
+  txt=txt+"<th>SLA Code</th>";
+  txt=txt+"<th>Effective Date</th>";
+  txt=txt+"<th>Serial</th>";
+  txt=txt+"<th>Est Actif</th>";
+  txt=txt+"<th>Nom Français</th>";
+  txt=txt+"<th>Nom Anglais</th>";
+  txt=txt+"</tr>";
+  x=xmlhttp.responseXML.documentElement.getElementsByTagName("sla");
+  for (i=0;i<x.length;i++)
+    {
+    txt=txt + "<tr>";
+	txt=txt+getOneElementTable(x[i],"id_sla");
+	txt=txt+getOneElementTable(x[i],"effdt");
+	txt=txt+getOneElementTable(x[i],"serial");
+	txt=txt+getOneElementTable(x[i],"is_used");
+	txt=txt+getOneElementTable(x[i],"sla_name_fr");
+	txt=txt+getOneElementTable(x[i],"sla_name_uk");
+	txt=txt+"<td>"+"url("+getOneElementData(x[i],"id_sla")+")"+"</td>";
+    txt=txt + "</tr>";
+    
+    }
+  txt=txt + "</table>";
+  // xx=x[0].getElementsByTagName("effdt");
+  document.getElementById('CurrentDate').value=getOneElementData(x[0],"effdt");
+  // document.getElementById('CurrentDate').value=xx[0].firstChild.nodeValue;
+  document.getElementById('slaInfoTbl').innerHTML=txt;
+  }
+  
+}
+xmlhttp.open("GET",url,true);
+xmlhttp.send();
+}
+</script>
+
+</head>
+<body>
+<textarea id="tutu" name="tutu" rows="3" cols="30" > 
+   Texte affiché dans la balise textarea en tttttt
+</textarea>
+<form method="POST" >
+quel est l'effective date : <input id="effdt" name="effdt" autofocus type="date" onblur="getSlaDailyData(this.value,'current')"><br>
+ <!-- <input type="submit" value="record"> -->
+</form>
+<input type="hidden" name="CurrentDate" id="CurrentDate"/>
+
+<input type=button value="SLA précédente" onclick="getSlaDailyData(document.getElementById('CurrentDate').value,'previous')">
+<input type=button value="SLA suivante" onclick="getSlaDailyData(document.getElementById('CurrentDate').value,'next')">
+ 
+
+<div id="slaInfoTbl">
+</div>
+</body>
+</html>
+
+
+
