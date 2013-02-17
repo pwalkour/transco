@@ -1,37 +1,18 @@
-INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 1, 'JOUR', 'DAY', 1);
-INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 2, 'NUIT', 'NIGHT', 1);
-INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 3, 'WE', 'WEEKEND', 1);
-INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 4, 'FERIE', 'HOLIDAY', 1);
-;
-UPDATE sla set sla_name_uk="poufff" where id_sla=1;
-
-delete from sla where id_sla=3;
-
-call synchSlaHisto ('2013-01-04');
-
-select 
-    *
-from
-    test;
-call p();
-
--- delete from sla where inc_sla_UK>2;
--- delete from sla_histo where inc_sla_UK>=1;
-select 
-    *
-from
-    sla;
-
-select 
-    *
-from
-    sla_histo;
-
-
+-- ***********************
+-- ***********************
 DELIMITER $$
 DROP PROCEDURE IF EXISTS getSlaHistoEffdtSerial $$
-create procedure getSlaHistoEffdtSerial (IN i_Effdt date, IN i_Nav varchar(8), out o_Effdt date, out o_Serial INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getSlaHistoEffdtSerial`(IN i_Effdt date, IN i_Nav varchar(8), out o_Effdt date, out o_Serial INT)
 begin
+-- ******** IN ***********
+-- 
+-- ******** OUT **********
+-- 
+-- ******** AIM **********
+-- 
+-- ******** REM **********
+--
+-- ***********************
 if (i_Nav="next") then
     select coalesce(min(slaH.effdt),'1900-01-01') into o_Effdt
       from sla_histo slaH
@@ -141,3 +122,40 @@ call getSlaHistoData('2013-01-03');
 call getSlaHistoData('2012-02-02');
 
 UPDATE sla set sla_name_uk="tutu" where id_sla=4;
+
+-- ***********************
+-- Simulate data entries
+-- ***********************
+INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 1, 'JOUR', 'DAY', 1);
+INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 2, 'NUIT', 'NIGHT', 1);
+INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 3, 'WE', 'WEEKEND', 1);
+INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 4, 'FERIE', 'HOLIDAY', 1);
+;
+-- simulate an update
+UPDATE sla set sla_name_uk="poufff" where id_sla=1;
+
+-- simulate a delete
+delete from sla where id_sla=3;
+
+-- REMARK about delete do not delete the row, change the field "is_used" to 0, so it can be re-used later
+
+-- simulate a global commit on date of 4 January 2013
+call synchSlaHisto ('2013-01-04');
+
+select 
+    *
+from
+    test;
+call p();
+
+-- delete from sla where inc_sla_UK>2;
+-- delete from sla_histo where inc_sla_UK>=1;
+select 
+    *
+from
+    sla;
+
+select 
+    *
+from
+    sla_histo;
