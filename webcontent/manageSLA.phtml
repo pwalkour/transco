@@ -10,30 +10,19 @@ function getOneElementTable(aReference,aKey)
 	$returnStr="";
 	 xx=aReference.getElementsByTagName(aKey);
      {
-     try
-       {
-    	 $returnStr= "<td>" + xx[0].firstChild.nodeValue + "</td>";
-       }
-     catch (er)
-       {
-    	 $returnStr = "<td>&nbsp;</td>";
-       }
+     try { $returnStr= "<td>" + xx[0].firstChild.nodeValue + "</td>"; }
+     catch (er) { $returnStr = "<td>&nbsp;</td>"; }
      }
      return $returnStr;
 }
+
 function getOneElementData(aReference,aKey)
 {
 	$returnStr="";
 	 xx=aReference.getElementsByTagName(aKey);
      {
-     try
-       {
-    	 $returnStr= xx[0].firstChild.nodeValue ;
-       }
-     catch (er)
-       {
-    	 $returnStr = "-?-";
-       }
+     try { $returnStr= xx[0].firstChild.nodeValue ; }
+     catch (er) { $returnStr = "-?-"; }
      }
      return $returnStr;
 }
@@ -82,18 +71,41 @@ if (xmlhttp.readyState==4 && xmlhttp.status==200)
 	txt=txt+getOneElementTable(x[i],"sla_name_uk");
 	txt=txt+"<td>"+"url("+getOneElementData(x[i],"id_sla")+")"+"</td>";
     txt=txt + "</tr>";
-    
     }
   txt=txt + "</table>";
-  // xx=x[0].getElementsByTagName("effdt");
   document.getElementById('CurrentDate').value=getOneElementData(x[0],"effdt");
-  // document.getElementById('CurrentDate').value=xx[0].firstChild.nodeValue;
   document.getElementById('slaInfoTbl').innerHTML=txt;
   }
-  
 }
 xmlhttp.open("GET",url,true);
 xmlhttp.send();
+}
+
+function UpdateSla (id_sla)
+{
+
+	// use html parser
+	txt="<form methode='POST'>";
+	txt=txt+"<table border='1'>"
+	    txt=txt+"<tr>";
+	    txt=txt+"<th>SLA Code</th>";
+	    txt=txt+"<th>Effective Date</th>";
+	    txt=txt+"<th>Serial</th>";
+	    txt=txt+"<th>Est Actif</th>";
+	    txt=txt+"<th>Nom Français</th>";
+	    txt=txt+"<th>Nom Anglais</th>";
+	    txt=txt+"</tr>";  
+
+	    txt=txt+"<tr>";
+	    txt=txt+"<td></th>";
+	    txt=txt+"<td>Effective Date</th>";
+	    txt=txt+"<td>Serial</th>";
+	    txt=txt+"<td>Est Actif</th>";
+	    txt=txt+"<td>Nom Français</th>";
+	    txt=txt+"<td>Nom Anglais</th>";
+	    txt=txt+"</tr>";
+    txt=txt + "</table>";
+	txt=txt+"</form>
 }
 </script>
 
@@ -114,6 +126,10 @@ quel est l'effective date : <input id="effdt" name="effdt" autofocus type="date"
 
 <div id="slaInfoTbl">
 </div>
+<div id="slaUpdForm">
+</div>
+
+
 </body>
 </html>
 
