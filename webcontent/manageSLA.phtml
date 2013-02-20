@@ -27,7 +27,17 @@ function getOneElementData(aReference,aKey)
      return $returnStr;
 }
 
-
+function getSlaTableHeader(){
+	  $txt="<tr>";
+	  $txt=$txt+"<th>SLA Code</th>";
+	  $txt=$txt+"<th>Effective Date</th>";
+	  $txt=$txt+"<th>Serial</th>";
+	  $txt=$txt+"<th>Est Actif</th>";
+	  $txt=$txt+"<th>Nom Français</th>";
+	  $txt=$txt+"<th>Nom Anglais</th>";
+	  $txt=$txt+"</tr>";
+	  return $txt;
+}
 function getSlaDailyData(aDate,aNavigate)
 {
 
@@ -51,14 +61,7 @@ xmlhttp.onreadystatechange=function()
 if (xmlhttp.readyState==4 && xmlhttp.status==200)
   {
   txt="<table border='1'>";
-  txt=txt+"<tr>";
-  txt=txt+"<th>SLA Code</th>";
-  txt=txt+"<th>Effective Date</th>";
-  txt=txt+"<th>Serial</th>";
-  txt=txt+"<th>Est Actif</th>";
-  txt=txt+"<th>Nom Français</th>";
-  txt=txt+"<th>Nom Anglais</th>";
-  txt=txt+"</tr>";
+  txt=txt+getSlaTableHeader();
   x=xmlhttp.responseXML.documentElement.getElementsByTagName("sla");
   for (i=0;i<x.length;i++)
     {
@@ -69,7 +72,7 @@ if (xmlhttp.readyState==4 && xmlhttp.status==200)
 	txt=txt+getOneElementTable(x[i],"is_used");
 	txt=txt+getOneElementTable(x[i],"sla_name_fr");
 	txt=txt+getOneElementTable(x[i],"sla_name_uk");
-	txt=txt+"<td>"+"url("+getOneElementData(x[i],"id_sla")+")"+"</td>";
+	txt=txt+"<td><form methode='POST'><input type='submit' value='Edit' onclick='UpdateSla("+getOneElementData(x[i],'id_sla')+")' /></form></td>";
     txt=txt + "</tr>";
     }
   txt=txt + "</table>";
@@ -83,30 +86,44 @@ xmlhttp.send();
 
 function UpdateSla (id_sla)
 {
-
+	
 	// use html parser
 	txt="<form methode='POST'>";
+	txt=txt+"quel est l'effective date : <input id='effdtUpd' name='effdt' autofocus type='date'><br>"
 	txt=txt+"<table border='1'>"
+	txt=txt+getSlaTableHeader(); 
+		
 	    txt=txt+"<tr>";
-	    txt=txt+"<th>SLA Code</th>";
-	    txt=txt+"<th>Effective Date</th>";
-	    txt=txt+"<th>Serial</th>";
-	    txt=txt+"<th>Est Actif</th>";
-	    txt=txt+"<th>Nom Français</th>";
-	    txt=txt+"<th>Nom Anglais</th>";
-	    txt=txt+"</tr>";  
-
-	    txt=txt+"<tr>";
-	    txt=txt+"<td></th>";
-	    txt=txt+"<td>Effective Date</th>";
-	    txt=txt+"<td>Serial</th>";
-	    txt=txt+"<td>Est Actif</th>";
-	    txt=txt+"<td>Nom Français</th>";
-	    txt=txt+"<td>Nom Anglais</th>";
+	    txt=txt+"<td>id_sla</td>"; // id_sla 
+	    txt=txt+"<td>document.getElementById( 'effdtUpd' )</td>"; //effdt 
+	    txt=txt+"<td>--</td>"; // serial 
+	    txt=txt+"<td><input id='isUsed' name='isUsed' required /></td>"; // is_used 
+	    txt=txt+"<td><input id='frenshName' name='frenshName' required /></td>"; // sla_name_fr 
+	    txt=txt+"<td><input id='englishName' name='englishName' required /></td>"; //sla_name_uk 
 	    txt=txt+"</tr>";
-    txt=txt + "</table>";
-	txt=txt+"</form>
+    txt=txt + "</table><br>";
+    txt=txt + "<input type='submit' value='write' />"
+	txt=txt+"</form>"
+	document.getElementById('slaUpdForm').innerHTML=txt;
 }
+
+function getSlaTableAsArray(elementId) {
+	table = document.getElementById( elementId );
+	tableArr = [];
+	for ( i = 1; i < $table.rows.length; i++ ) {
+    	tableArray.push({
+    		id_sla: table.rows[i].cells[0].innerHTML,
+    		effdt: table.rows[i].cells[1].innerHTML,
+    		serial: table.rows[i].cells[2].innerHTML,
+    		is_used: table.rows[i].cells[3].innerHTML,
+    		sla_name_fr: table.rows[i].cells[4].innerHTML,
+    		sla_name_uk: table.rows[i].cells[5].innerHTML
+    	}
+        );
+	}
+    return tableArray
+}
+
 </script>
 
 </head>
