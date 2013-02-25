@@ -4,6 +4,7 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS getSlaHistoEffdtSerial $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getSlaHistoEffdtSerial`(IN i_Effdt date, IN i_Nav varchar(8), out o_Effdt date, out o_Serial INT)
 begin
+
 -- ******** IN ***********
 -- 
 -- ******** OUT **********
@@ -13,11 +14,19 @@ begin
 -- ******** REM **********
 --
 -- ***********************
+    Declare v_NbrRecords int; 
 if (i_Nav="next") then
-    select coalesce(min(slaH.effdt),'1900-01-01') into o_Effdt
-      from sla_histo slaH
-     where slaH.effdt>i_Effdt
-    ;
+    select count(*) into v_NbrRecords from sla_histo slaH
+     where slaH.effdt>i_Effdt;
+    if ( v_NbrRecords<>0) then
+        select coalesce(min(slaH.effdt),'1900-01-01') into o_Effdt
+        from sla_histo slaH
+        where slaH.effdt>i_Effdt;
+    else
+        select coalesce(min(slaH.effdt),'1900-01-01') into o_Effdt
+        from sla_histo slaH
+        where slaH.effdt=i_Effdt;
+    end if;
 end if;
 if (i_Nav="current") then
     select coalesce(max(slaH.effdt),'1900-01-01') into o_Effdt
@@ -26,10 +35,17 @@ if (i_Nav="current") then
     ;
 end if;
 if (i_Nav="previous") then
-    select coalesce(max(slaH.effdt),'1900-01-01') into o_Effdt
-      from sla_histo slaH
-     where slaH.effdt<i_Effdt
-    ;
+    select count(*) into v_NbrRecords from sla_histo slaH
+     where slaH.effdt<i_Effdt;
+    if ( v_NbrRecords<>0) then
+        select coalesce(max(slaH.effdt),'1900-01-01') into o_Effdt
+        from sla_histo slaH
+        where slaH.effdt<i_Effdt;
+    else
+        select coalesce(max(slaH.effdt),'1900-01-01') into o_Effdt
+        from sla_histo slaH
+        where slaH.effdt=i_Effdt;
+    end if;
 end if;
 
 

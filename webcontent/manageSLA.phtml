@@ -41,47 +41,48 @@ function getSlaTableHeader(){
 function getSlaDailyData(aDate,aNavigate)
 {
 
-var url="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
-//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
-var xmlhttp;
-var x,name_fr,name_uk,is_used;
-document.getElementById('tutu').value=url;
-//alert(aDate);
-
-if (window.XMLHttpRequest)
-  {// code for IE7+, Firefox, Chrome, Opera, Safari 
-  xmlhttp=new XMLHttpRequest();
-  }
-else
-  {// code for IE6, IE5 
-  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-  }
-xmlhttp.onreadystatechange=function()
-{
-if (xmlhttp.readyState==4 && xmlhttp.status==200)
-  {
-  txt="<table border='1'>";
-  txt=txt+getSlaTableHeader();
-  x=xmlhttp.responseXML.documentElement.getElementsByTagName("sla");
-  for (i=0;i<x.length;i++)
-    {
-    txt=txt + "<tr>";
-	txt=txt+getOneElementTable(x[i],"id_sla");
-	txt=txt+getOneElementTable(x[i],"effdt");
-	txt=txt+getOneElementTable(x[i],"serial");
-	txt=txt+getOneElementTable(x[i],"is_used");
-	txt=txt+getOneElementTable(x[i],"sla_name_fr");
-	txt=txt+getOneElementTable(x[i],"sla_name_uk");
-	txt=txt+"<td><form methode='POST'><input type='submit' value='Edit' onclick='UpdateSla("+getOneElementData(x[i],'id_sla')+")' /></form></td>";
-    txt=txt + "</tr>";
-    }
-  txt=txt + "</table>";
-  document.getElementById('CurrentDate').value=getOneElementData(x[0],"effdt");
-  document.getElementById('slaInfoTbl').innerHTML=txt;
-  }
-}
-xmlhttp.open("GET",url,true);
-xmlhttp.send();
+	var url="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
+	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
+	var xmlhttp;
+	var x,name_fr,name_uk,is_used;
+	document.getElementById('tutu').value=url;
+	//alert(aDate);
+	
+	if (window.XMLHttpRequest)
+	{// code for IE7+, Firefox, Chrome, Opera, Safari 
+		xmlhttp=new XMLHttpRequest();
+	}
+	else
+	{// code for IE6, IE5 
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	
+	xmlhttp.onreadystatechange=function()
+	{
+		if (xmlhttp.readyState==4 && xmlhttp.status==200)
+		{
+			txt="<table border='1'>";
+			txt=txt+getSlaTableHeader();
+			x=xmlhttp.responseXML.documentElement.getElementsByTagName("sla");
+			for (i=0;i<x.length;i++)
+			{
+				txt=txt + "<tr>";
+				txt=txt+getOneElementTable(x[i],"id_sla");
+				txt=txt+getOneElementTable(x[i],"effdt");
+				txt=txt+getOneElementTable(x[i],"serial");
+				txt=txt+getOneElementTable(x[i],"is_used");
+				txt=txt+getOneElementTable(x[i],"sla_name_fr");
+				txt=txt+getOneElementTable(x[i],"sla_name_uk");
+				txt=txt+"<td><form methode='POST'><input type='submit' value='Edit' onclick='UpdateSla("+getOneElementData(x[i],'id_sla')+")' /></form></td>";
+				txt=txt + "</tr>";
+			}
+			txt=txt + "</table>";
+			document.getElementById('CurrentDate').value=getOneElementData(x[0],"effdt");
+			document.getElementById('slaInfoTbl').innerHTML=txt;
+		}
+	}
+	xmlhttp.open("GET",url,true);
+	xmlhttp.send();
 }
 
 function UpdateSla (id_sla)
@@ -89,13 +90,13 @@ function UpdateSla (id_sla)
 	
 	// use html parser
 	txt="<form methode='POST'>";
-	txt=txt+"quel est l'effective date : <input id='effdtUpd' name='effdt' autofocus type='date'><br>"
+	txt=txt+"quel est l'effective date : <input id='effdtUpd' name='effdtUpd' autofocus type='date'><br>"
 	txt=txt+"<table border='1'>"
 	txt=txt+getSlaTableHeader(); 
 		
 	    txt=txt+"<tr>";
-	    txt=txt+"<td>id_sla</td>"; // id_sla 
-	    txt=txt+"<td>document.getElementById( 'effdtUpd' )</td>"; //effdt 
+	    txt=txt+"<td>"+id_sla+"</td>"; // id_sla 
+	    txt=txt+"<td>"+document.getElementById( 'effdtUpd' )+"</td>"; //effdt 
 	    txt=txt+"<td>--</td>"; // serial 
 	    txt=txt+"<td><input id='isUsed' name='isUsed' required /></td>"; // is_used 
 	    txt=txt+"<td><input id='frenshName' name='frenshName' required /></td>"; // sla_name_fr 
