@@ -27,90 +27,137 @@ function getOneElementData(aReference,aKey)
      return $returnStr;
 }
 
-function getSlaTableHeader(){
-	  $txt="<tr>";
-	  $txt=$txt+"<th>SLA Code</th>";
-	  $txt=$txt+"<th>Effective Date</th>";
-	  $txt=$txt+"<th>Serial</th>";
-	  $txt=$txt+"<th>Est Actif</th>";
-	  $txt=$txt+"<th>Nom Français</th>";
-	  $txt=$txt+"<th>Nom Anglais</th>";
-	  $txt=$txt+"</tr>";
-	  return $txt;
+function getSlaTableHeader(aPattern){
+	  txtgetSlaTableHeader="<tr>";
+	  if (aPattern=="all" || aPattern.lastIndexOf("1")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>SLA Code</th>" };
+	  if (aPattern=="all" || aPattern.lastIndexOf("2")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Effective Date</th>" };
+	  if (aPattern=="all" || aPattern.lastIndexOf("3")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Serial</th>" };
+	  if (aPattern=="all" || aPattern.lastIndexOf("4")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Est Actif</th>" };
+	  if (aPattern=="all" || aPattern.lastIndexOf("5")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Nom Français</th>" };
+	  if (aPattern=="all" || aPattern.lastIndexOf("6")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Nom Anglais</th>" };
+	  txtgetSlaTableHeader=txtgetSlaTableHeader+"</tr>";
+	  return txtgetSlaTableHeader;
 }
 function getSlaDailyData(aDate,aNavigate)
 {
 
-	var url="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
+	var urlSlaDailyData="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
 	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
-	var xmlhttp;
-	var x,name_fr,name_uk,is_used;
-	document.getElementById('tutu').value=url;
+	var xmlhttpSlaDailyData;
+	var xSlaDailyData,name_fr,name_uk,is_used;
+	document.getElementById('tutu').value=urlSlaDailyData;
 	//alert(aDate);
 	
 	if (window.XMLHttpRequest)
 	{// code for IE7+, Firefox, Chrome, Opera, Safari 
-		xmlhttp=new XMLHttpRequest();
+		xmlhttpSlaDailyData=new XMLHttpRequest();
 	}
 	else
 	{// code for IE6, IE5 
-		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		xmlhttpSlaDailyData=new ActiveXObject("Microsoft.XMLHTTP");
 	}
 	
-	xmlhttp.onreadystatechange=function()
+	xmlhttpSlaDailyData.onreadystatechange=function()
 	{
-		if (xmlhttp.readyState==4 && xmlhttp.status==200)
+		if (xmlhttpSlaDailyData.readyState==4 && xmlhttpSlaDailyData.status==200)
 		{
-			txt="<table border='1'>";
-			txt=txt+getSlaTableHeader();
-			x=xmlhttp.responseXML.documentElement.getElementsByTagName("sla");
-			for (i=0;i<x.length;i++)
+			txtGetSlaDailyData="<table border='1'>";
+			txtGetSlaDailyData=txtGetSlaDailyData+getSlaTableHeader("all");
+			xSlaDailyData=xmlhttpSlaDailyData.responseXML.documentElement.getElementsByTagName("sla");
+			for (i=0;i<xSlaDailyData.length;i++)
 			{
-				txt=txt + "<tr>";
-				txt=txt+getOneElementTable(x[i],"id_sla");
-				txt=txt+getOneElementTable(x[i],"effdt");
-				txt=txt+getOneElementTable(x[i],"serial");
-				txt=txt+getOneElementTable(x[i],"is_used");
-				txt=txt+getOneElementTable(x[i],"sla_name_fr");
-				txt=txt+getOneElementTable(x[i],"sla_name_uk");
-				txt=txt+"<td><form methode='POST'><input type='submit' value='Edit' onclick='UpdateSla("+getOneElementData(x[i],'id_sla')+")' /></form></td>";
-				txt=txt + "</tr>";
+				txtGetSlaDailyData=txtGetSlaDailyData + "<tr>";
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"id_sla");
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"effdt");
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"serial");
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"is_used");
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"sla_name_fr");
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"sla_name_uk");
+				//txt=txt+"<td><form methode='POST'><input type='submit' value='Edit' onclick='UpdateSla("+getOneElementData(x[i],'id_sla')+","+aDate+","+aNavigate+")' /></form></td>";
+				txtGetSlaDailyData=txtGetSlaDailyData + "</tr>";
 			}
-			txt=txt + "</table>";
-			document.getElementById('CurrentDate').value=getOneElementData(x[0],"effdt");
-			document.getElementById('slaInfoTbl').innerHTML=txt;
+			txtGetSlaDailyData=txtGetSlaDailyData + "</table>";
+			document.getElementById('CurrentDate').value=getOneElementData(xSlaDailyData[0],"effdt");
+			document.getElementById('effdt').value=getOneElementData(xSlaDailyData[0],"effdt");
+			document.getElementById('slaInfoTbl').innerHTML=txtGetSlaDailyData;
 		}
 	}
-	xmlhttp.open("GET",url,true);
-	xmlhttp.send();
+	xmlhttpSlaDailyData.open("GET",urlSlaDailyData,true);
+	xmlhttpSlaDailyData.send();
 }
 
-function UpdateSla (id_sla)
+function updateSla (aDate,aNavigate)
 {
+	var urlUpdateSla="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
+	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
+	var xmlhttpUpdateSla;
+	var xUpdateSla,name_fr,name_uk,is_used;
+	document.getElementById('tutu').value=urlUpdateSla;
+	//alert(aDate);
 	
-	// use html parser
-	txt="<form methode='POST'>";
-	txt=txt+"quel est l'effective date : <input id='effdtUpd' name='effdtUpd' autofocus type='date'><br>"
-	txt=txt+"<table border='1'>"
-	txt=txt+getSlaTableHeader(); 
-		
-	    txt=txt+"<tr>";
-	    txt=txt+"<td>"+id_sla+"</td>"; // id_sla 
-	    txt=txt+"<td>"+document.getElementById( 'effdtUpd' )+"</td>"; //effdt 
-	    txt=txt+"<td>--</td>"; // serial 
-	    txt=txt+"<td><input id='isUsed' name='isUsed' required /></td>"; // is_used 
-	    txt=txt+"<td><input id='frenshName' name='frenshName' required /></td>"; // sla_name_fr 
-	    txt=txt+"<td><input id='englishName' name='englishName' required /></td>"; //sla_name_uk 
-	    txt=txt+"</tr>";
-    txt=txt + "</table><br>";
-    txt=txt + "<input type='submit' value='write' />"
-	txt=txt+"</form>"
-	document.getElementById('slaUpdForm').innerHTML=txt;
+	if (window.XMLHttpRequest)
+	{// code for IE7+, Firefox, Chrome, Opera, Safari 
+		xmlhttpUpdateSla=new XMLHttpRequest();
+	}
+	else
+	{// code for IE6, IE5 
+		xmlhttpUpdateSla=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	
+	xmlhttpUpdateSla.onreadystatechange=function()
+	{
+		if (xmlhttpUpdateSla.readyState==4 && xmlhttpUpdateSla.status==200)
+		{
+			// use html parser
+			document.getElementById('effdt').value=aDate;
+			//txtUpdateSla=txtUpdateSla+"<br><br>quel est l'effective date : <input id='effdtUpd' name='effdtUpd' autofocus type='date' value='"+aDate+"'><br>"
+			txtUpdateSla="<form methode='POST'>";
+			txtUpdateSla=txtUpdateSla+"<br><br><table border='1'>"
+			txtUpdateSla=txtUpdateSla+getSlaTableHeader("1456"); 
+			xUpdateSla=xmlhttpUpdateSla.responseXML.documentElement.getElementsByTagName("sla");
+			for (i=0;i<xUpdateSla.length;i++)
+			{
+				txtUpdateSla=txtUpdateSla+"<tr>";
+				txtUpdateSla=txtUpdateSla+getOneElementTable(xUpdateSla[i],"id_sla");
+				//txtUpdateSla=txtUpdateSla+getOneElementTable(xUpdateSla[i],"effdt");
+				if (getOneElementData(xUpdateSla[i],"is_used")==0) {
+					txtUpdateSla=txtUpdateSla
+						+"<td>"
+						+"<select id='isUsed' name='isUsed' required>"
+						+"<option value='0' selected> Inactif</option>"
+						+"<option value='1' > Actif</option>"
+						+"</select>"
+						+"</td>"; // is_used 
+				}
+				else {
+					txtUpdateSla=txtUpdateSla
+					+"<td>"
+					+"<select id='isUsed' name='isUsed' required>"
+					+"<option value='0' > Inactif</option>"
+					+"<option value='1' selected> Actif</option>"
+					+"</select>"
+					+"</td>"; // is_used 
+
+				}
+				txtUpdateSla=txtUpdateSla+"<td><input id='frenshName' name='frenshName' required value='"+getOneElementData(xUpdateSla[i],"sla_name_fr")+"' /></td>"; // sla_name_fr 
+				txtUpdateSla=txtUpdateSla+"<td><input id='englishName' name='englishName' required value='"+getOneElementData(xUpdateSla[i],"sla_name_uk")+"' /></td>"; //sla_name_uk 
+				txtUpdateSla=txtUpdateSla+"</tr>";
+			}
+			txtUpdateSla=txtUpdateSla + "</table><br>";
+			txtUpdateSla=txtUpdateSla + "<input type='button' value='Ecrire' onclick='getSlaDailyData(document.getElementById("+"\""+"effdtUpd"+"\""+").value,"+"\""+"current"+"\""+")' />";
+			txtUpdateSla=txtUpdateSla+"</form>";
+			document.getElementById('CurrentDate').value=document.getElementById('effdt').value;
+			document.getElementById('slaInfoTbl').innerHTML=txtUpdateSla;
+		}
+	}
+	xmlhttpUpdateSla.open("GET",urlUpdateSla,true);
+	xmlhttpUpdateSla.send();
+
 }
 
 function getSlaTableAsArray(elementId) {
 	table = document.getElementById( elementId );
-	tableArr = [];
+	tableArray = [];
 	for ( i = 1; i < $table.rows.length; i++ ) {
     	tableArray.push({
     		id_sla: table.rows[i].cells[0].innerHTML,
@@ -122,7 +169,7 @@ function getSlaTableAsArray(elementId) {
     	}
         );
 	}
-    return tableArray
+    return tableArray;
 }
 
 </script>
@@ -132,14 +179,16 @@ function getSlaTableAsArray(elementId) {
 <textarea id="tutu" name="tutu" rows="3" cols="30" > 
    Texte affiché dans la balise textarea en tttttt
 </textarea>
-<form method="POST" >
-quel est l'effective date : <input id="effdt" name="effdt" autofocus type="date" onblur="getSlaDailyData(this.value,'current')"><br>
+<!-- <form method="POST" > -->
+<br>
+quel est l'effective date : <input id="effdt" name="effdt" autofocus type="date" onblur="getSlaDailyData(this.value,'current')" /><br>
  <!-- <input type="submit" value="record"> -->
-</form>
+<!-- </form> -->
 <input type="hidden" name="CurrentDate" id="CurrentDate"/>
 
-<input type=button value="SLA précédente" onclick="getSlaDailyData(document.getElementById('CurrentDate').value,'previous')">
-<input type=button value="SLA suivante" onclick="getSlaDailyData(document.getElementById('CurrentDate').value,'next')">
+<input type=button value="SLA précédente" onclick="getSlaDailyData(document.getElementById('CurrentDate').value,'previous')" />
+<input type=button value="SLA edition" onclick="updateSla(document.getElementById('CurrentDate').value,'current')" />
+<input type=button value="SLA suivante" onclick="getSlaDailyData(document.getElementById('CurrentDate').value,'next')" />
  
 
 <div id="slaInfoTbl">

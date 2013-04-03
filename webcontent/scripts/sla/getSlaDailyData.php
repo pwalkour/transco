@@ -12,7 +12,7 @@
 	    echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
 	}
 	
-	$request= "call getSlaHistoData(".$effdt.",".$nav.");";
+	$request= "call slaGetHistoData(".$effdt.",".$nav.");";
 	if (!($res=$mysqli->query($request, MYSQLI_STORE_RESULT))) {
 	    echo "call procedure failed: (" . $mysqli->errno . ") " . $mysqli->error;
 	}
