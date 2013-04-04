@@ -1,57 +1,66 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang='fr'>
 <head>
-<meta charset="utf-8" />
+<meta charset='utf-8' />
 <title>Transco : ajouter une sla</title>
-<link rel="stylesheet" href="styles/main_transco_style.css" />
+<link rel='stylesheet' href='styles/main_transco_style.css' />
 <script>
-function getOneElementTable(aReference,aKey)
-{
-	$returnStr="";
+function getOneElementTable(aReference,aKey) {
+	$returnStr='';
 	 xx=aReference.getElementsByTagName(aKey);
      {
-     try { $returnStr= "<td>" + xx[0].firstChild.nodeValue + "</td>"; }
-     catch (er) { $returnStr = "<td>&nbsp;</td>"; }
+     try { $returnStr= '<td>' + xx[0].firstChild.nodeValue + '</td>'; }
+     catch (er) { $returnStr = '<td>&nbsp;</td>'; }
      }
      return $returnStr;
 }
 
-function getOneElementData(aReference,aKey)
-{
-	$returnStr="";
+function getOneElementData(aReference,aKey) {
+	$returnStr='';
 	 xx=aReference.getElementsByTagName(aKey);
      {
      try { $returnStr= xx[0].firstChild.nodeValue ; }
-     catch (er) { $returnStr = "-?-"; }
+     catch (er) { $returnStr = '-?-'; }
      }
      return $returnStr;
 }
 
-function getSlaTableHeader(aPattern){
-	  txtgetSlaTableHeader="<tr>";
-	  if (aPattern=="all" || aPattern.lastIndexOf("1")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>SLA Code</th>" };
-	  if (aPattern=="all" || aPattern.lastIndexOf("2")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Effective Date</th>" };
-	  if (aPattern=="all" || aPattern.lastIndexOf("3")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Serial</th>" };
-	  if (aPattern=="all" || aPattern.lastIndexOf("4")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Est Actif</th>" };
-	  if (aPattern=="all" || aPattern.lastIndexOf("5")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Nom Français</th>" };
-	  if (aPattern=="all" || aPattern.lastIndexOf("6")>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+"<th>Nom Anglais</th>" };
-	  txtgetSlaTableHeader=txtgetSlaTableHeader+"</tr>";
+function getSlaTableHeader(aPattern) {
+	  txtgetSlaTableHeader='<tr>';
+	  if (aPattern=='all' || aPattern.lastIndexOf('1')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>SLA Code</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('2')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Effective Date</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('3')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Serial</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('4')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Est Actif</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('5')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Nom Français</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('6')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Nom Anglais</th>' };
+	  txtgetSlaTableHeader=txtgetSlaTableHeader+'</tr>';
 	  return txtgetSlaTableHeader;
 }
+
 function slaDoAction(aDate,aNavigate,aAction) {
-	//document.getElementById('CurrentDate').value=aDate;
-	if (aAction=="select") {
-		document.getElementById('slaAction').value="select";
-		getSlaDailyData(aDate,aNavigate)
-	}
-	else {
-		document.getElementById('slaAction').value="update";
-		upDateSla (aDate,aNavigate);
-	}
 	
+	switch(aAction) {
+		case 'select':
+			document.getElementById('slaAction').value='select';
+			getSlaDailyData(aDate,aNavigate)
+			break;
+		case 'update':
+			document.getElementById('slaAction').value='update';
+			upDateSla (aDate,aNavigate);
+			break;
+		case 'write':
+			tableArray=getSlaTableAsArray('slaTableCRUD');
+			break;
+		case 'add':
+			slaDoAction(aDate,aNavigate,'write');
+			a=1;
+			break;
+		case 'delete':
+			break;
+	}
 }
-function getSlaDailyData(aDate,aNavigate)
-{
+
+function getSlaDailyData(aDate,aNavigate) {
 
 	var urlSlaDailyData="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
 	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
@@ -60,37 +69,31 @@ function getSlaDailyData(aDate,aNavigate)
 	document.getElementById('tutu').value=urlSlaDailyData;
 	//alert(aDate);
 	
-	if (window.XMLHttpRequest)
-	{// code for IE7+, Firefox, Chrome, Opera, Safari 
+	if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari 
 		xmlhttpSlaDailyData=new XMLHttpRequest();
 	}
-	else
-	{// code for IE6, IE5 
-		xmlhttpSlaDailyData=new ActiveXObject("Microsoft.XMLHTTP");
+	else {// code for IE6, IE5 
+		xmlhttpSlaDailyData=new ActiveXObject('Microsoft.XMLHTTP');
 	}
 	
-	xmlhttpSlaDailyData.onreadystatechange=function()
-	{
-		if (xmlhttpSlaDailyData.readyState==4 && xmlhttpSlaDailyData.status==200)
-		{
-			txtGetSlaDailyData="<table border='1'>";
-			txtGetSlaDailyData=txtGetSlaDailyData+getSlaTableHeader("all");
-			xSlaDailyData=xmlhttpSlaDailyData.responseXML.documentElement.getElementsByTagName("sla");
-			for (i=0;i<xSlaDailyData.length;i++)
-			{
-				txtGetSlaDailyData=txtGetSlaDailyData + "<tr>";
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"id_sla");
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"effdt");
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"serial");
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"is_used");
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"sla_name_fr");
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],"sla_name_uk");
+	xmlhttpSlaDailyData.onreadystatechange=function() {
+		if (xmlhttpSlaDailyData.readyState==4 && xmlhttpSlaDailyData.status==200) {
+			xSlaDailyData=xmlhttpSlaDailyData.responseXML.documentElement.getElementsByTagName('sla');
+			txtGetSlaDailyData='<table id="slaTableData" border="1">';
+			txtGetSlaDailyData=txtGetSlaDailyData+getSlaTableHeader('all');
+			for (i=0;i<xSlaDailyData.length;i++) {
+				txtGetSlaDailyData=txtGetSlaDailyData + '<tr>';
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'id_sla');
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'effdt');
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'serial');
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'is_used');
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'sla_name_fr');
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'sla_name_uk');
 				//txt=txt+"<td><form methode='POST'><input type='submit' value='Edit' onclick='UpdateSla("+getOneElementData(x[i],'id_sla')+","+aDate+","+aNavigate+")' /></form></td>";
-				txtGetSlaDailyData=txtGetSlaDailyData + "</tr>";
+				txtGetSlaDailyData=txtGetSlaDailyData + '</tr>';
 			}
-			txtGetSlaDailyData=txtGetSlaDailyData + "</table>";
-			//document.getElementById('CurrentDate').value=getOneElementData(xSlaDailyData[0],"effdt");
-			document.getElementById('effdt').value=getOneElementData(xSlaDailyData[0],"effdt");
+			txtGetSlaDailyData=txtGetSlaDailyData + '</table>';
+			document.getElementById('effdt').value=getOneElementData(xSlaDailyData[0],'effdt');
 			document.getElementById('slaInfoTbl').innerHTML=txtGetSlaDailyData;
 		}
 	}
@@ -98,71 +101,67 @@ function getSlaDailyData(aDate,aNavigate)
 	xmlhttpSlaDailyData.send();
 }
 
-function upDateSla (aDate,aNavigate)
-{
-	var urlUpdateSla="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
+function upDateSla (aDate,aNavigate) {
+	var urlUpdateSla='./scripts/sla/getSlaDailyData.php?effdt="'+aDate+'"&nav="'+aNavigate+'"';
 	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
 	var xmlhttpUpdateSla;
 	var xUpdateSla,name_fr,name_uk,is_used;
 	document.getElementById('tutu').value=urlUpdateSla;
 	//alert(aDate);
 	
-	if (window.XMLHttpRequest)
-	{// code for IE7+, Firefox, Chrome, Opera, Safari 
+	if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari 
 		xmlhttpUpdateSla=new XMLHttpRequest();
 	}
-	else
-	{// code for IE6, IE5 
-		xmlhttpUpdateSla=new ActiveXObject("Microsoft.XMLHTTP");
+	else {// code for IE6, IE5 
+		xmlhttpUpdateSla=new ActiveXObject('Microsoft.XMLHTTP');
 	}
 	
-	xmlhttpUpdateSla.onreadystatechange=function()
-	{
-		if (xmlhttpUpdateSla.readyState==4 && xmlhttpUpdateSla.status==200)
-		{
+	xmlhttpUpdateSla.onreadystatechange=function() {
+		if (xmlhttpUpdateSla.readyState==4 && xmlhttpUpdateSla.status==200) {
 			// use html parser
 			//document.getElementById('effdt').value=aDate;
 			//txtUpdateSla=txtUpdateSla+"<br><br>quel est l'effective date : <input id='effdtUpd' name='effdtUpd' autofocus type='date' value='"+aDate+"'><br>"
-			txtUpdateSla="<form methode='POST'>";
-			txtUpdateSla=txtUpdateSla+"<br><br><table border='1'>"
-			txtUpdateSla=txtUpdateSla+getSlaTableHeader("1456"); 
-			xUpdateSla=xmlhttpUpdateSla.responseXML.documentElement.getElementsByTagName("sla");
-			for (i=0;i<xUpdateSla.length;i++)
-			{
-				txtUpdateSla=txtUpdateSla+"<tr>";
-				txtUpdateSla=txtUpdateSla+getOneElementTable(xUpdateSla[i],"id_sla");
+			
+			xUpdateSla=xmlhttpUpdateSla.responseXML.documentElement.getElementsByTagName('sla');
+			txtUpdateSla='<form methode="POST">';
+			txtUpdateSla=txtUpdateSla+"<br><br>"
+			tableUpdateSla='<table id="slaTableCRUD" border="1">'
+			tableUpdateSla=tableUpdateSla+getSlaTableHeader('1456'); 
+			for (i=0;i<xUpdateSla.length;i++) {
+				tableUpdateSla=tableUpdateSla+'<tr>';
+				tableUpdateSla=tableUpdateSla+getOneElementTable(xUpdateSla[i],'id_sla');
 				//txtUpdateSla=txtUpdateSla+getOneElementTable(xUpdateSla[i],"effdt");
-				if (getOneElementData(xUpdateSla[i],"is_used")==0) {
-					txtUpdateSla=txtUpdateSla
-						+"<td>"
-						+"<select id='isUsed' name='isUsed' required>"
-						+"<option value='0' selected> Inactif</option>"
-						+"<option value='1' > Actif</option>"
-						+"</select>"
-						+"</td>"; // is_used 
+				if (getOneElementData(xUpdateSla[i],'is_used')==0) {
+					tableUpdateSla=tableUpdateSla
+						+'<td>'
+						+'<select id="isUsed'+(i+1)+'" name="isUsed'+(i+1)+'" required>'
+						+'<option value="0" selected> Inactif</option>'
+						+'<option value="1" > Actif</option>'
+						+'</select>'
+						+'</td>'; // is_used 
 				}
 				else {
-					txtUpdateSla=txtUpdateSla
-					+"<td>"
-					+"<select id='isUsed' name='isUsed' required>"
-					+"<option value='0' > Inactif</option>"
-					+"<option value='1' selected> Actif</option>"
-					+"</select>"
-					+"</td>"; // is_used 
-
+					tableUpdateSla=tableUpdateSla
+					+'<td>'
+					+'<select id="isUsed'+(i+1)+'" name="isUsed'+(i+1)+'" required>'
+					+'<option value="0" > Inactif</option>'
+					+'<option value="1" selected> Actif</option>'
+					+'</select>'
+					+'</td>'; // is_used  
 				}
-				txtUpdateSla=txtUpdateSla+"<td><input id='frenshName' name='frenshName' required value='"+getOneElementData(xUpdateSla[i],"sla_name_fr")+"' /></td>"; // sla_name_fr 
-				txtUpdateSla=txtUpdateSla+"<td><input id='englishName' name='englishName' required value='"+getOneElementData(xUpdateSla[i],"sla_name_uk")+"' /></td>"; //sla_name_uk 
-				txtUpdateSla=txtUpdateSla+"</tr>";
+				tableUpdateSla=tableUpdateSla+'<td><input id="frenshName'+(i+1)+'" name="frenshName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'sla_name_fr')+'" /></td>'; // sla_name_fr 
+				tableUpdateSla=tableUpdateSla+'<td><input id="englishName'+(i+1)+'" name="englishName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'sla_name_uk')+'" /></td>'; //sla_name_uk 
+				tableUpdateSla=tableUpdateSla+'</tr>';
 			}
-			txtUpdateSla=txtUpdateSla + "</table><br>";
-			txtUpdateSla=txtUpdateSla + '<input type="button" value="Ecrire" onclick="slaDoAction(document.getElementById (\'effdt\').value,\'current\',\'select\')\" />';
-			txtUpdateSla=txtUpdateSla+"</form>";
-			//document.getElementById('CurrentDate').value=document.getElementById('effdt').value;
+			tableUpdateSla=tableUpdateSla + '</table><br>';
+			txtUpdateSla=txtUpdateSla + tableUpdateSla
+			txtUpdateSla=txtUpdateSla + '<div id="slaAdd"><input type="button" value="Ajouter un nouveau" onclick="slaDoAction(document.getElementById (\'effdt\').value,\'current\',\'add\')\" /></div>';
+			txtUpdateSla=txtUpdateSla + '<div id="slaWrite"><input type="button" value="Ecrire" onclick="slaDoAction(document.getElementById (\'effdt\').value,\'current\',\'write\')\" /></div>';
+			txtUpdateSla=txtUpdateSla + '</form>';
 			document.getElementById('slaInfoTbl').innerHTML=txtUpdateSla;
 		}
 	}
-	xmlhttpUpdateSla.open("GET",urlUpdateSla,true);
+	xmlhttpUpdateSla.open('GET',urlUpdateSla,true);
 	xmlhttpUpdateSla.send();
 
 }
@@ -170,16 +169,13 @@ function upDateSla (aDate,aNavigate)
 function getSlaTableAsArray(elementId) {
 	table = document.getElementById( elementId );
 	tableArray = [];
-	for ( i = 1; i < $table.rows.length; i++ ) {
-    	tableArray.push({
+	for ( i = 1; i < table.rows.length; i++ ) {
+    	tableArray.push ( {
     		id_sla: table.rows[i].cells[0].innerHTML,
-    		effdt: table.rows[i].cells[1].innerHTML,
-    		serial: table.rows[i].cells[2].innerHTML,
-    		is_used: table.rows[i].cells[3].innerHTML,
-    		sla_name_fr: table.rows[i].cells[4].innerHTML,
-    		sla_name_uk: table.rows[i].cells[5].innerHTML
-    	}
-        );
+    		is_used: document.getElementById( 'isUsed'+i ).value,
+    		sla_name_fr: document.getElementById( 'frenshName'+i ).value,
+    		sla_name_uk: document.getElementById( 'englishName'+i ).value
+    	} );
 	}
     return tableArray;
 }
@@ -188,33 +184,29 @@ function getSlaTableAsArray(elementId) {
 
 </head>
 <body>
-<div id="variables">
-<input type="hidden" name="CurrentDate" id="CurrentDate"/>
-<input type="hidden" name="slaAction" id="slaAction" value="select"/>
+<div id='variables'>
+<input type='hidden' name='slaAction' id='slaAction' value='select'/>
 </div>
-<textarea id="tutu" name="tutu" rows="3" cols="30" > 
+<textarea id='tutu' name='tutu' rows='3' cols='30' > 
    Texte affiché dans la balise textarea en tttttt
 </textarea>
 <br>
-<div id="SlaSelectDate">
-quel est l'effective date : <input id="effdt" name="effdt" autofocus type="date" onblur="slaDoAction(this.value,'current',document.getElementById('slaAction').value)" /><br>
+<div id='SlaSelectDate'>
+quel est l'effective date : <input id='effdt' name='effdt' autofocus type='date' onblur='slaDoAction(this.value,"current",document.getElementById("slaAction").value)' /><br>
 </div>
 
-<div id="Previous">
-	<input type=button value="SLA précédente" onclick="slaDoAction(document.getElementById('effdt').value,'previous',document.getElementById('slaAction').value)" />
+<div id='Previous'>
+	<input type='button' value='SLA précédente' onclick='slaDoAction(document.getElementById("effdt").value,"previous",document.getElementById("slaAction").value)' />
 </div>
-<div id="slaEdit">
-	<input type=button value="SLA edition" onclick="slaDoAction(document.getElementById('effdt').value,'current','update')" />
+<div id='slaEdit'>
+	<input type='button' value='SLA edition' onclick='slaDoAction(document.getElementById("effdt").value,"current","update")' />
 </div>
-<div id="slaNext">
-	<input type=button value="SLA suivante" onclick="slaDoAction(document.getElementById('effdt').value,'next',document.getElementById('slaAction').value)" />
-</div>
-
-<div id="slaInfoTbl">
-</div>
-<div id="slaUpdForm">
+<div id='slaNext'>
+	<input type='button' value='SLA suivante' onclick='slaDoAction(document.getElementById("effdt").value,"next",document.getElementById("slaAction").value)' />
 </div>
 
+<div id='slaInfoTbl'>
+</div>
 
 </body>
 </html>
