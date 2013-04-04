@@ -38,6 +38,18 @@ function getSlaTableHeader(aPattern){
 	  txtgetSlaTableHeader=txtgetSlaTableHeader+"</tr>";
 	  return txtgetSlaTableHeader;
 }
+function slaDoAction(aDate,aNavigate,aAction) {
+	//document.getElementById('CurrentDate').value=aDate;
+	if (aAction=="select") {
+		document.getElementById('slaAction').value="select";
+		getSlaDailyData(aDate,aNavigate)
+	}
+	else {
+		document.getElementById('slaAction').value="update";
+		upDateSla (aDate,aNavigate);
+	}
+	
+}
 function getSlaDailyData(aDate,aNavigate)
 {
 
@@ -77,7 +89,7 @@ function getSlaDailyData(aDate,aNavigate)
 				txtGetSlaDailyData=txtGetSlaDailyData + "</tr>";
 			}
 			txtGetSlaDailyData=txtGetSlaDailyData + "</table>";
-			document.getElementById('CurrentDate').value=getOneElementData(xSlaDailyData[0],"effdt");
+			//document.getElementById('CurrentDate').value=getOneElementData(xSlaDailyData[0],"effdt");
 			document.getElementById('effdt').value=getOneElementData(xSlaDailyData[0],"effdt");
 			document.getElementById('slaInfoTbl').innerHTML=txtGetSlaDailyData;
 		}
@@ -86,7 +98,7 @@ function getSlaDailyData(aDate,aNavigate)
 	xmlhttpSlaDailyData.send();
 }
 
-function updateSla (aDate,aNavigate)
+function upDateSla (aDate,aNavigate)
 {
 	var urlUpdateSla="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
 	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
@@ -109,7 +121,7 @@ function updateSla (aDate,aNavigate)
 		if (xmlhttpUpdateSla.readyState==4 && xmlhttpUpdateSla.status==200)
 		{
 			// use html parser
-			document.getElementById('effdt').value=aDate;
+			//document.getElementById('effdt').value=aDate;
 			//txtUpdateSla=txtUpdateSla+"<br><br>quel est l'effective date : <input id='effdtUpd' name='effdtUpd' autofocus type='date' value='"+aDate+"'><br>"
 			txtUpdateSla="<form methode='POST'>";
 			txtUpdateSla=txtUpdateSla+"<br><br><table border='1'>"
@@ -144,9 +156,9 @@ function updateSla (aDate,aNavigate)
 				txtUpdateSla=txtUpdateSla+"</tr>";
 			}
 			txtUpdateSla=txtUpdateSla + "</table><br>";
-			txtUpdateSla=txtUpdateSla + "<input type='button' value='Ecrire' onclick='getSlaDailyData(document.getElementById("+"\""+"effdtUpd"+"\""+").value,"+"\""+"current"+"\""+")' />";
+			txtUpdateSla=txtUpdateSla + '<input type="button" value="Ecrire" onclick="slaDoAction(document.getElementById (\'effdt\').value,\'current\',\'select\')\" />';
 			txtUpdateSla=txtUpdateSla+"</form>";
-			document.getElementById('CurrentDate').value=document.getElementById('effdt').value;
+			//document.getElementById('CurrentDate').value=document.getElementById('effdt').value;
 			document.getElementById('slaInfoTbl').innerHTML=txtUpdateSla;
 		}
 	}
@@ -176,20 +188,27 @@ function getSlaTableAsArray(elementId) {
 
 </head>
 <body>
+<div id="variables">
+<input type="hidden" name="CurrentDate" id="CurrentDate"/>
+<input type="hidden" name="slaAction" id="slaAction" value="select"/>
+</div>
 <textarea id="tutu" name="tutu" rows="3" cols="30" > 
    Texte affiché dans la balise textarea en tttttt
 </textarea>
-<!-- <form method="POST" > -->
 <br>
-quel est l'effective date : <input id="effdt" name="effdt" autofocus type="date" onblur="getSlaDailyData(this.value,'current')" /><br>
- <!-- <input type="submit" value="record"> -->
-<!-- </form> -->
-<input type="hidden" name="CurrentDate" id="CurrentDate"/>
+<div id="SlaSelectDate">
+quel est l'effective date : <input id="effdt" name="effdt" autofocus type="date" onblur="slaDoAction(this.value,'current',document.getElementById('slaAction').value)" /><br>
+</div>
 
-<input type=button value="SLA précédente" onclick="getSlaDailyData(document.getElementById('CurrentDate').value,'previous')" />
-<input type=button value="SLA edition" onclick="updateSla(document.getElementById('CurrentDate').value,'current')" />
-<input type=button value="SLA suivante" onclick="getSlaDailyData(document.getElementById('CurrentDate').value,'next')" />
- 
+<div id="Previous">
+	<input type=button value="SLA précédente" onclick="slaDoAction(document.getElementById('effdt').value,'previous',document.getElementById('slaAction').value)" />
+</div>
+<div id="slaEdit">
+	<input type=button value="SLA edition" onclick="slaDoAction(document.getElementById('effdt').value,'current','update')" />
+</div>
+<div id="slaNext">
+	<input type=button value="SLA suivante" onclick="slaDoAction(document.getElementById('effdt').value,'next',document.getElementById('slaAction').value)" />
+</div>
 
 <div id="slaInfoTbl">
 </div>
