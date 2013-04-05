@@ -24,5 +24,47 @@
 -- 
 -- ******** REM **********
 --
--- ***********************    call slaGetHistoEffdtSerial(i_Effdt, i_nav, @aEffdt, @aSerial);    if (@aEffdt<>'1900-01-01') then        select id_sla, effdt,serial,is_used, sla_name_fr, sla_name_uk from sla_histo where effdt=@aEffdt and serial=@aSerial;    else        select 0, @aEffdt,@aSerial,0, 'Pas de données', 'No data';    end if;    -- select id_sla, effdt,serial,is_used, sla_name_fr, sla_name_uk from sla_histo where effdt='2013-01-01' and serial=1;end $$DELIMITER ;call slaGetHistoEffdtSerial('2013-02-02','next', @aEffdt, @aSerial);select @aEffdt,@aSerial;select id_sla, effdt,serial,is_used, sla_name_fr, sla_name_uk from sla_histo where effdt=@aEffdt and serial=@aSerial;call slaSynchHisto ('2013-01-02');call slaGetHistoData('2013-01-01',@aIdSla, @aEffdt, @aSerial, @aIsUsed, @aSlaNameFr, @aSlaNameUk);select @aIdSla, @aEffdt, @aSerial, @aIsUsed, @aSlaNameFr, @aSlaNameUk;-- delete from sla where inc_sla_UK>2;-- delete from sla_histo where inc_sla_UK>=1;-- commit;call slaGetHistoData('2013-01-01');call slaGetHistoData('2013-01-02');call slaGetHistoData('2013-01-03');call slaGetHistoData('2012-02-02');UPDATE sla set sla_name_uk="tutu" where id_sla=4;-- ***********************-- Simulate data entries-- ***********************INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 1, 'JOUR', 'DAY', 1);INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 2, 'NUIT', 'NIGHT', 1);INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 3, 'WE', 'WEEKEND', 1);INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 4, 'FERIE', 'HOLIDAY', 1);;-- simulate an updateUPDATE sla set sla_name_uk="poufff" where id_sla=1;-- simulate a deletedelete from sla where id_sla=3;-- REMARK about delete do not delete the row, change the field "is_used" to 0, so it can be re-used later-- simulate a global commit on date of 4 January 2013call slaSynchHisto ('2013-01-04');select     *from    test;call p();-- delete from sla where inc_sla_UK>2;-- delete from sla_histo where inc_sla_UK>=1;select     *from    sla;INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 3, 'WE', 'WEEKEND', 0);
-insert into sla_histo (id_sla, effdt,serial,is_used, sla_name_fr, sla_name_uk) values( 3, '2013-01-04', 2,0, 'WE', 'WEEKEND') ;select     *from    sla_histo;
+-- ***********************    call slaGetHistoEffdtSerial(i_Effdt, i_nav, @aEffdt, @aSerial);    if (@aEffdt<>'1900-01-01') then        select id_sla, effdt,serial,is_used, sla_name_fr, sla_name_uk from sla_histo where effdt=@aEffdt and serial=@aSerial;    else        select 0, @aEffdt,@aSerial,0, 'Pas de données', 'No data';    end if;    -- select id_sla, effdt,serial,is_used, sla_name_fr, sla_name_uk from sla_histo where effdt='2013-01-01' and serial=1;end $$DELIMITER ;call slaGetHistoEffdtSerial('2013-02-02','next', @aEffdt, @aSerial);select @aEffdt,@aSerial;select id_sla, effdt,serial,is_used, sla_name_fr, sla_name_uk from sla_histo where effdt=@aEffdt and serial=@aSerial;call slaSynchHisto ('2013-01-02');call slaGetHistoData('2013-01-01',@aIdSla, @aEffdt, @aSerial, @aIsUsed, @aSlaNameFr, @aSlaNameUk);select @aIdSla, @aEffdt, @aSerial, @aIsUsed, @aSlaNameFr, @aSlaNameUk;-- delete from sla where inc_sla_UK>2;-- delete from sla_histo where inc_sla_UK>=1;-- commit;call slaGetHistoData('2013-01-01');call slaGetHistoData('2013-01-02');call slaGetHistoData('2013-01-03');call slaGetHistoData('2012-02-02');UPDATE sla set sla_name_uk="tutu" where id_sla=4;-- ***********************-- Simulate data entries-- ***********************
+delete from sla_ins where id_sla=id_sla;INSERT INTO `transco`.`sla_ins` (`id_sla`, `effdt`, `is_used`, `sla_name_fr`, `sla_name_uk`) VALUES (1,'2013-01-01',1, 'JOUR', 'DAY');INSERT INTO `transco`.`sla_ins` (`id_sla`, `effdt`, `is_used`, `sla_name_fr`, `sla_name_uk`) VALUES (2,'2013-01-01',1, 'NUIT', 'NIGHT');INSERT INTO `transco`.`sla_ins` (`id_sla`, `effdt`, `is_used`, `sla_name_fr`, `sla_name_uk`) VALUES (3,'2013-01-01',1, 'WE', 'WEEKEND');INSERT INTO `transco`.`sla_ins` (`id_sla`, `effdt`, `is_used`, `sla_name_fr`, `sla_name_uk`) VALUES (4,'2013-01-01',1, 'FERIE', 'HOLIDAY');;-- simulate an updateUPDATE sla set sla_name_uk="poufff" where id_sla=1;-- simulate a deletedelete from sla where id_sla=3;-- REMARK about delete do not delete the row, change the field "is_used" to 0, so it can be re-used later-- simulate a global commit on date of 4 January 2013call slaSynchHisto ('2013-01-04');select     *from    test;call p();-- delete from sla where inc_sla_UK>2;-- delete from sla_histo where inc_sla_UK>=1;select     *from    sla;INSERT INTO `transco`.`sla` (`inc_sla_UK`, `id_sla`, `sla_name_fr`, `sla_name_uk`, `is_used`) VALUES (NULL, 3, 'WE', 'WEEKEND', 0);
+insert into sla_histo (id_sla, effdt,serial,is_used, sla_name_fr, sla_name_uk) values( 3, '2013-01-04', 2,0, 'WE', 'WEEKEND') ;select     *from    sla_histo;
+
+
+
+
+call salGetHistoData (CURDATE(),'current');
+select coalesce(max(slaH.effdt),'1900-01-01') into o_Effdt
+      from sla_histo slaH
+     where slaH.effdt<=i_Effdt
+;
+select 
+      sla.id_sla
+    , sla.effdt
+    , sla.serial
+    , sla.is_used
+    , sla.sla_name_fr
+    , sla.sla_name_uk
+from Sla_histo sla 
+where sla.serial=( select coalesce(max(slaS.serial),0) from sla_histo slaS where slaS.effdt=(sla_histo))
+
+order by id_sla
+;
+select 
+      id_sla
+    , effdt
+    , serial
+    , is_used
+    , sla_name_fr
+    , sla_name_uk
+from Sla_histo Sla
+   , ( select SlaEffdt.o_effdt, coalesce(max(slaS.serial),0) as o_Serial
+         from sla_histo slaS
+             , ( select coalesce(max(slaE.effdt),'1900-01-01') as o_Effdt
+                 from sla_histo slaE
+                where slaE.effdt<=curdate()
+               ) SlaEffdt
+        where slaS.effdt = SlaEffdt.o_Effdt
+      ) SlaCur
+where Sla.effdt=SlaCur.o_Effdt
+  and Sla.serial=SlaCur.o_Serial
+order by id_sla
+;
