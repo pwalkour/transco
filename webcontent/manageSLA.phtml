@@ -4,7 +4,9 @@
 <meta charset='utf-8' />
 <title>Transco : ajouter une sla</title>
 <link rel='stylesheet' href='styles/main_transco_style.css' />
+<script src="./scripts/general/myAjaxLib.js"></script>
 <script>
+
 function getOneElementTable(aReference,aKey) {
 	$returnStr='';
 	 xx=aReference.getElementsByTagName(aKey);
@@ -49,7 +51,7 @@ function slaDoAction(aDate,aNavigate,aAction) {
 			upDateSla (aDate,aNavigate);
 			break;
 		case 'write':
-			tableArray=getSlaTableAsArray('slaTableCRUD');
+			tableAsXML=getSlaTableAsXML('slaTableCRUD');
 			break;
 		case 'add':
 			slaDoAction(aDate,aNavigate,'write');
@@ -166,18 +168,31 @@ function upDateSla (aDate,aNavigate) {
 
 }
 
-function getSlaTableAsArray(elementId) {
+function getSlaTableAsXML(elementId) {
 	table = document.getElementById( elementId );
-	tableArray = [];
+	var salXMLDataToInsert="";
+	salXMLDataToInsert="<slas>";
+	 
 	for ( i = 1; i < table.rows.length; i++ ) {
+		/*
     	tableArray.push ( {
     		id_sla: table.rows[i].cells[0].innerHTML,
     		is_used: document.getElementById( 'isUsed'+i ).value,
     		sla_name_fr: document.getElementById( 'frenshName'+i ).value,
     		sla_name_uk: document.getElementById( 'englishName'+i ).value
     	} );
+    	*/
+    	salXMLDataToInsert=salXMLDataToInsert+"<sla>";
+    	salXMLDataToInsert=salXMLDataToInsert+"<id_sla>"+table.rows[i].cells[0].innerHTML+"</id_sla>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<is_used>"+document.getElementById( 'isUsed'+i ).value+"</is_used>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<sla_name_fr>"+document.getElementById( 'frenshName'+i ).value+"</sla_name_fr>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<sla_name_uk>"+document.getElementById( 'englishName'+i ).value+"</sla_name_uk>"
+    	salXMLDataToInsert=salXMLDataToInsert+"</sla>"
 	}
-    return tableArray;
+	salXMLDataToInsert=salXMLDataToInsert+"</slas>";
+    //return tableArray;
+    //return salXMLDataToInsert;
+    return loadXMLString(salXMLDataToInsert);
 }
 
 </script>
