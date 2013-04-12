@@ -195,6 +195,26 @@ function getSlaTableAsXML(elementId) {
     return loadXMLString(salXMLDataToInsert);
 }
 
+function addSlaTableaRow(elementId) {
+	table = document.getElementById( elementId );
+	var salXMLDataToInsert="";
+	salXMLDataToInsert="<slas>";
+	 
+	for ( i = 1; i < table.rows.length; i++ ) {
+    	salXMLDataToInsert=salXMLDataToInsert+"<sla>";
+    	salXMLDataToInsert=salXMLDataToInsert+"<id_sla>"+table.rows[i].cells[0].innerHTML+"</id_sla>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<is_used>"+document.getElementById( 'isUsed'+i ).value+"</is_used>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<sla_name_fr>"+document.getElementById( 'frenshName'+i ).value+"</sla_name_fr>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<sla_name_uk>"+document.getElementById( 'englishName'+i ).value+"</sla_name_uk>"
+    	
+    	salXMLDataToInsert=salXMLDataToInsert+"</sla>"
+	}
+	salXMLDataToInsert=salXMLDataToInsert+"</slas>";
+    //return tableArray;
+    //return salXMLDataToInsert;
+    return loadXMLString(salXMLDataToInsert);
+}
+
 </script>
 
 </head>
