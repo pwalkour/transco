@@ -26,9 +26,9 @@ data
 	mysql_select_db($base,$connection);
 	
 
-	$request="select * from sla;";
+	$request="select * from slaHisto";
 	echo "-".$request."<hr><br>";
-	$results=mysql_query($request);
+	$results=mysql_query($request,$connection);
 	echo "-> >".$results."<hr><br>";
 	
 	if (!$results) {
@@ -61,10 +61,10 @@ data
 	}
 
 	while ($a_row=mysql_fetch_array($results) )
-		echo "record:[".$a_row['id_sla']."],[".$a_row['effdt']."],[".$a_row['serial']."],[".$a_row['sla_name_fr']."],[".$a_row['sla_name_uk']."],[".$a_row['is_used']."]<br>";
+		echo "record:[".$a_row['idSla']."],[".$a_row['effdt']."],[".$a_row['serial']."],[".$a_row['slaNameFR']."],[".$a_row['slaNameUK']."],[".$a_row['isUsed']."]<br>";
 	mysql_free_result($results);
 	
-	$request="select * from sla where effdt='2013-01-28' and serial=(select max(serial) from sla where effdt='2013-01-28');";
+	$request="select * from slaHisto where effdt='2013-01-28' and serial=(select max(serial) from sla where effdt='2013-01-28');";
 	echo "-".$request."<hr><br>";
 	$results=mysql_query($request);
 	echo "-> >".$results."<hr><br>";
@@ -73,7 +73,7 @@ data
 		die('Query failed: ' . mysql_error());
 	}
 	while ($a_row=mysql_fetch_array($results) )
-		echo "record:[".$a_row['id_sla']."],[".$a_row['effdt']."],[".$a_row['serial']."],[".$a_row['sla_name_fr']."],[".$a_row['sla_name_uk']."],[".$a_row['is_used']."]<br>";
+		echo "record:[".$a_row['idSla']."],[".$a_row['effdt']."],[".$a_row['serial']."],[".$a_row['slaNameFR']."],[".$a_row['slaNameUK']."],[".$a_row['isUsed']."]<br>";
 	mysql_free_result($results);
 	?>
 </body>

@@ -1,102 +1,16 @@
-<!DOCTYPE html>
-<HTML>
-<HEAD>
-    <TITLE> Add/Remove dynamic rows in HTML table </TITLE>
-    <SCRIPT >
-        function addRow(tableID) {
- 
-            var table = document.getElementById(tableID);
- 
-            var rowCount = table.rows.length;
-            var newId=0;
-            for (var h=0;h<rowCount; h++ ) {
-				if (parseInt(table.rows[h].cells[1].childNodes[0].nodeValue)>=parseInt(newId)) {
-					newId=(parseInt(table.rows[h].cells[1].childNodes[0].nodeValue)+1).toString();
-				}
-            }
-            var row = table.insertRow(rowCount);
- 
-            var colCount = table.rows[0].cells.length;
+<?php
 
-            
-            for(var i=0; i<colCount; i++) {
- 
-                var newcell = row.insertCell(i);
-                if (i==0) {
-                	newcell.innerHTML='<INPUT type="checkbox" name="chk"/>';
-                	newcell.childNodes[0].checked = false;
-                }
-                else if (i==1) {
-                	newcell.innerHTML=newId;
-                }
-                else {
-                newcell.innerHTML = table.rows[0].cells[i].innerHTML;
-                //alert(newcell.childNodes);
-                switch(newcell.childNodes[0].type) {
-                    case "text":
-                            newcell.childNodes[0].value = "";                            
-                            break;
-                    case "checkbox":
-                            newcell.childNodes[0].checked = false;
-                            break;
-                    case "select-one":
-                            newcell.childNodes[0].selectedIndex = 0;
-                            break;
-                }
-              }
+$key = "XXXXX";
+$test = array($key => "test5");
 
-            }
-        }
- 
-        function deleteRow(tableID) {
-            try {
-            var table = document.getElementById(tableID);
-            var rowCount = table.rows.length;
- 
-            for(var i=0; i<rowCount; i++) {
-                var row = table.rows[i];
-                var chkbox = row.cells[0].childNodes[0];
-                if(null != chkbox && true == chkbox.checked) {
-                    if(rowCount <= 1) {
-                        alert("Cannot delete all the rows.");
-                        break;
-                    }
-                    table.deleteRow(i);
-                    rowCount--;
-                    i--;
-                }
- 
- 
-            }
-            }catch(e) {
-                alert(e);
-            }
-        }
- 
-    </SCRIPT>
-</HEAD>
-<BODY>
- 
-    <INPUT type="button" value="Add Row" onclick="addRow('dataTable')" />
- 
-    <INPUT type="button" value="Delete Row" onclick="deleteRow('dataTable')" />
- 
-    <TABLE id="dataTable" width="350px" border="1">
-        <TR>
-            <TD></TD>
-            <TD>5</TD>
-            <TD><INPUT type="text" name="txt"/></TD>
-            <TD>
-                <SELECT name="country">
-                    <OPTION value="in">India</OPTION>
-                    <OPTION value="de">Germany</OPTION>
-                    <OPTION value="fr">France</OPTION>
-                    <OPTION value="us">United States</OPTION>
-                    <OPTION value="ch">Switzerland</OPTION>
-                </SELECT>
-            </TD>
-        </TR>
-    </TABLE>
- 
-</BODY>
-</HTML>
+for ($x = 0; $x < 500; $x++) {
+  $key .= "X";
+  $value = "test" . strlen($key);
+  $test[$key] = $value;
+}
+
+echo "<pre>";
+print_r($test);
+echo "</pre>";
+
+?>

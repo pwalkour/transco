@@ -2,3 +2,7 @@
 *.bak
 
 *.bak
+
+*.bak
+
+webcontent/scripts/general/.DS_Store

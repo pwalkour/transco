@@ -65,12 +65,9 @@ function slaDoAction(aDate,aNavigate,aAction) {
 function getSlaDailyData(aDate,aNavigate) {
 
 	var urlSlaDailyData="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
-	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
 	var xmlhttpSlaDailyData;
 	var xSlaDailyData,name_fr,name_uk,is_used;
 	document.getElementById('tutu').value=urlSlaDailyData;
-	//alert(aDate);
-	
 	if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari 
 		xmlhttpSlaDailyData=new XMLHttpRequest();
 	}
@@ -85,13 +82,12 @@ function getSlaDailyData(aDate,aNavigate) {
 			txtGetSlaDailyData=txtGetSlaDailyData+getSlaTableHeader('all');
 			for (i=0;i<xSlaDailyData.length;i++) {
 				txtGetSlaDailyData=txtGetSlaDailyData + '<tr>';
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'id_sla');
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'idSla');
 				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'effdt');
 				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'serial');
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'is_used');
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'sla_name_fr');
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'sla_name_uk');
-				//txt=txt+"<td><form methode='POST'><input type='submit' value='Edit' onclick='UpdateSla("+getOneElementData(x[i],'id_sla')+","+aDate+","+aNavigate+")' /></form></td>";
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'isUsed');
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameFR');
+				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameUK');
 				txtGetSlaDailyData=txtGetSlaDailyData + '</tr>';
 			}
 			txtGetSlaDailyData=txtGetSlaDailyData + '</table>';
@@ -120,10 +116,6 @@ function upDateSla (aDate,aNavigate) {
 	
 	xmlhttpUpdateSla.onreadystatechange=function() {
 		if (xmlhttpUpdateSla.readyState==4 && xmlhttpUpdateSla.status==200) {
-			// use html parser
-			//document.getElementById('effdt').value=aDate;
-			//txtUpdateSla=txtUpdateSla+"<br><br>quel est l'effective date : <input id='effdtUpd' name='effdtUpd' autofocus type='date' value='"+aDate+"'><br>"
-			
 			xUpdateSla=xmlhttpUpdateSla.responseXML.documentElement.getElementsByTagName('sla');
 			txtUpdateSla='<form methode="POST">';
 			txtUpdateSla=txtUpdateSla+"<br><br>"
@@ -131,9 +123,8 @@ function upDateSla (aDate,aNavigate) {
 			tableUpdateSla=tableUpdateSla+getSlaTableHeader('1456'); 
 			for (i=0;i<xUpdateSla.length;i++) {
 				tableUpdateSla=tableUpdateSla+'<tr>';
-				tableUpdateSla=tableUpdateSla+getOneElementTable(xUpdateSla[i],'id_sla');
-				//txtUpdateSla=txtUpdateSla+getOneElementTable(xUpdateSla[i],"effdt");
-				if (getOneElementData(xUpdateSla[i],'is_used')==0) {
+				tableUpdateSla=tableUpdateSla+getOneElementTable(xUpdateSla[i],'idSla');
+				if (getOneElementData(xUpdateSla[i],'isUsed')==0) {
 					tableUpdateSla=tableUpdateSla
 						+'<td>'
 						+'<select id="isUsed'+(i+1)+'" name="isUsed'+(i+1)+'" required>'
@@ -151,8 +142,8 @@ function upDateSla (aDate,aNavigate) {
 					+'</select>'
 					+'</td>'; // is_used  
 				}
-				tableUpdateSla=tableUpdateSla+'<td><input id="frenshName'+(i+1)+'" name="frenshName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'sla_name_fr')+'" /></td>'; // sla_name_fr 
-				tableUpdateSla=tableUpdateSla+'<td><input id="englishName'+(i+1)+'" name="englishName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'sla_name_uk')+'" /></td>'; //sla_name_uk 
+				tableUpdateSla=tableUpdateSla+'<td><input id="frenshName'+(i+1)+'" name="frenshName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'slaNameFR')+'" /></td>'; // sla_name_fr 
+				tableUpdateSla=tableUpdateSla+'<td><input id="englishName'+(i+1)+'" name="englishName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'slaNameUK')+'" /></td>'; //sla_name_uk 
 				tableUpdateSla=tableUpdateSla+'</tr>';
 			}
 			tableUpdateSla=tableUpdateSla + '</table><br>';
@@ -174,24 +165,14 @@ function getSlaTableAsXML(elementId) {
 	salXMLDataToInsert="<slas>";
 	 
 	for ( i = 1; i < table.rows.length; i++ ) {
-		/*
-    	tableArray.push ( {
-    		id_sla: table.rows[i].cells[0].innerHTML,
-    		is_used: document.getElementById( 'isUsed'+i ).value,
-    		sla_name_fr: document.getElementById( 'frenshName'+i ).value,
-    		sla_name_uk: document.getElementById( 'englishName'+i ).value
-    	} );
-    	*/
     	salXMLDataToInsert=salXMLDataToInsert+"<sla>";
-    	salXMLDataToInsert=salXMLDataToInsert+"<id_sla>"+table.rows[i].cells[0].innerHTML+"</id_sla>"
-    	salXMLDataToInsert=salXMLDataToInsert+"<is_used>"+document.getElementById( 'isUsed'+i ).value+"</is_used>"
-    	salXMLDataToInsert=salXMLDataToInsert+"<sla_name_fr>"+document.getElementById( 'frenshName'+i ).value+"</sla_name_fr>"
-    	salXMLDataToInsert=salXMLDataToInsert+"<sla_name_uk>"+document.getElementById( 'englishName'+i ).value+"</sla_name_uk>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<idSla>"+table.rows[i].cells[0].innerHTML+"</idSla>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<isUsed>"+document.getElementById( 'isUsed'+i ).value+"</isUsed>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<slaNameFR>"+document.getElementById( 'frenshName'+i ).value+"</slaNameFR>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<slaNameUK>"+document.getElementById( 'englishName'+i ).value+"</slaNameUK>"
     	salXMLDataToInsert=salXMLDataToInsert+"</sla>"
 	}
 	salXMLDataToInsert=salXMLDataToInsert+"</slas>";
-    //return tableArray;
-    //return salXMLDataToInsert;
     return loadXMLString(salXMLDataToInsert);
 }
 
@@ -202,16 +183,14 @@ function addSlaTableaRow(elementId) {
 	 
 	for ( i = 1; i < table.rows.length; i++ ) {
     	salXMLDataToInsert=salXMLDataToInsert+"<sla>";
-    	salXMLDataToInsert=salXMLDataToInsert+"<id_sla>"+table.rows[i].cells[0].innerHTML+"</id_sla>"
-    	salXMLDataToInsert=salXMLDataToInsert+"<is_used>"+document.getElementById( 'isUsed'+i ).value+"</is_used>"
-    	salXMLDataToInsert=salXMLDataToInsert+"<sla_name_fr>"+document.getElementById( 'frenshName'+i ).value+"</sla_name_fr>"
-    	salXMLDataToInsert=salXMLDataToInsert+"<sla_name_uk>"+document.getElementById( 'englishName'+i ).value+"</sla_name_uk>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<idSla>"+table.rows[i].cells[0].innerHTML+"</idSla>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<isUsed>"+document.getElementById( 'isUsed'+i ).value+"</isUsed>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<slaNameFR>"+document.getElementById( 'frenshName'+i ).value+"</slaNameFR>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<slaNameUK>"+document.getElementById( 'englishName'+i ).value+"</slaNameUK>"
     	
     	salXMLDataToInsert=salXMLDataToInsert+"</sla>"
 	}
 	salXMLDataToInsert=salXMLDataToInsert+"</slas>";
-    //return tableArray;
-    //return salXMLDataToInsert;
     return loadXMLString(salXMLDataToInsert);
 }
 

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Transco : ajouter une sla</title>
+<link rel="stylesheet" href="styles/main_transco_style.css" />
+</head>
+<body>
+data
+
+	
+<?php
+include "./scripts/general/sqlTools.php";
+$columnsList=array();
+$mysqli = initConnection();
+
+/* check connection */
+if (mysqli_connect_errno()) {
+    printf("Connect failed: %s\n", mysqli_connect_error());
+    exit();
+}
+
+$query = "SELECT * from sla";
+
+if ($result = $mysqli->query($query)) {
+
+    /* Get field information for all columns */
+    $finfo = $result->fetch_fields();
+	$i=0;
+    foreach ($finfo as $val) {
+		$columnsList[$i++]=$val->type;
+		
+    }
+    $result->close();
+    print_r($columnsList);
+}
+
+
+$mysqli->close();
+?>
+	
+</body>
+</html>
