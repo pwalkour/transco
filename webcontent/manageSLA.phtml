@@ -44,7 +44,7 @@ function slaDoAction(aDate,aNavigate,aAction) {
 	switch(aAction) {
 		case 'select':
 			document.getElementById('slaAction').value='select';
-			getSlaDailyData(aDate,aNavigate)
+			getSlaDailyData(aDate,aNavigate,dotable);
 			break;
 		case 'update':
 			document.getElementById('slaAction').value='update';
@@ -62,43 +62,33 @@ function slaDoAction(aDate,aNavigate,aAction) {
 	}
 }
 
-function getSlaDailyData(aDate,aNavigate) {
+function getSlaDailyData(aDate,aNavigate,callback) {
 
 	var urlSlaDailyData="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
-	var xmlhttpSlaDailyData;
-	var xSlaDailyData,name_fr,name_uk,is_used;
 	document.getElementById('tutu').value=urlSlaDailyData;
-	if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari 
-		xmlhttpSlaDailyData=new XMLHttpRequest();
-	}
-	else {// code for IE6, IE5 
-		xmlhttpSlaDailyData=new ActiveXObject('Microsoft.XMLHTTP');
-	}
-	
-	xmlhttpSlaDailyData.onreadystatechange=function() {
-		if (xmlhttpSlaDailyData.readyState==4 && xmlhttpSlaDailyData.status==200) {
-			xSlaDailyData=xmlhttpSlaDailyData.responseXML.documentElement.getElementsByTagName('sla');
-			txtGetSlaDailyData='<table id="slaTableData" border="1">';
-			txtGetSlaDailyData=txtGetSlaDailyData+getSlaTableHeader('all');
-			for (i=0;i<xSlaDailyData.length;i++) {
-				txtGetSlaDailyData=txtGetSlaDailyData + '<tr>';
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'idSla');
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'effdt');
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'serial');
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'isUsed');
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameFR');
-				txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameUK');
-				txtGetSlaDailyData=txtGetSlaDailyData + '</tr>';
-			}
-			txtGetSlaDailyData=txtGetSlaDailyData + '</table>';
-			document.getElementById('effdt').value=getOneElementData(xSlaDailyData[0],'effdt');
-			document.getElementById('slaInfoTbl').innerHTML=txtGetSlaDailyData;
-		}
-	}
-	xmlhttpSlaDailyData.open("GET",urlSlaDailyData,true);
-	xmlhttpSlaDailyData.send();
+	requestServer(urlSlaDailyData,"GET",true,callback);
 }
 
+function dotable(responseXML) {
+	{
+		xSlaDailyData=responseXML.documentElement.getElementsByTagName('sla');
+		txtGetSlaDailyData='<table id="slaTableData" border="1">';
+		txtGetSlaDailyData=txtGetSlaDailyData+getSlaTableHeader('all');
+		for (i=0;i<xSlaDailyData.length;i++) {
+			txtGetSlaDailyData=txtGetSlaDailyData + '<tr>';
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'idSla');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'effdt');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'serial');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'isUsed');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameFR');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameUK');
+			txtGetSlaDailyData=txtGetSlaDailyData + '</tr>';
+		}
+		txtGetSlaDailyData=txtGetSlaDailyData + '</table>';
+		document.getElementById('effdt').value=getOneElementData(xSlaDailyData[0],'effdt');
+		document.getElementById('slaInfoTbl').innerHTML=txtGetSlaDailyData;
+	}
+}
 function upDateSla (aDate,aNavigate) {
 	var urlUpdateSla='./scripts/sla/getSlaDailyData.php?effdt="'+aDate+'"&nav="'+aNavigate+'"';
 	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 

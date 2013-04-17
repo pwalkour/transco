@@ -11,42 +11,47 @@ function initConnection()
 }
 
 function getColumnsArray($result) {
-	$columnsList=array();
-
+	$columns=array();
+	
 	/* Get field information for all columns */
 	$finfo = $result->fetch_fields();
+	$i=0;
 	foreach ($finfo as $val) {
-		$columnsList[$val->name]=$val->type;
+		$columns[$val->name]["type"]=$val->type;
+		$columns[$val->name]["position"]=$i++;
 	}
-	return $columnsList;
+	return $columns;
 }
 
 function buildXML($xmlMainChild,$request) {
 	$columnsArrayNames=array();
 	$columnList="";
+	$columnType="";
+	$ColumnPosition="";
 	$separator="";
 	
 	$mysqli=initConnection();
-	if ($mysqli->connect_errno) {
-		echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+	if ($mysqli->connect_errno) { echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
 	}
 
-	if (!($res=$mysqli->query($request, MYSQLI_STORE_RESULT))) {
-		echo "call procedure failed: (" . $mysqli->errno . ") " . $mysqli->error;
+	if (!($res=$mysqli->query($request, MYSQLI_STORE_RESULT))) { echo "call procedure failed: (" . $mysqli->errno . ") " . $mysqli->error;
 	}
 	
-	// get column metadata
-	$columnsArrayNames=getColumnsArray($res) ;
-	foreach ($columnsArrayNames as $aKey=>$aVal) {
-		$columnList.=$separator.$aKey;
-		$separator=",";
-	}
 	//create the root element
 	//create the xml document
 	$aXMLDoc = new DOMDocument();
 	$aXMLRoot = $aXMLDoc->appendChild($aXMLDoc->createElement($xmlMainChild."s"));
 	$aXMLDataElement = $aXMLRoot->appendChild($aXMLDoc->createElement("columns"));
-	$aXMLDataElement->appendChild($aXMLDoc->createElement("columnlist",$columnList));
+
+	// get column metadata
+	$columnsArrayNames=getColumnsArray($res) ;
+	foreach ($columnsArrayNames as $aName=>$subArray) {
+		//echo $aName; 
+		//print_r($subArray);
+		$aXMLDataSubElement=$aXMLDataElement->appendChild($aXMLDoc->createElement($aName));
+		$aXMLDataSubElement->appendChild($aXMLDoc->createElement("type",$subArray[type]));
+		$aXMLDataSubElement->appendChild($aXMLDoc->createElement("position",$subArray[position]));
+	}
 	
 	// populate XML
 	while($a_row = $res->fetch_array(MYSQLI_ASSOC)) {
@@ -54,7 +59,7 @@ function buildXML($xmlMainChild,$request) {
 		$aXMLDataElement = $aXMLRoot->appendChild($aXMLDoc->createElement($xmlMainChild));
 	
 		foreach($columnsArrayNames as $aKey=>$aVal) {
-			switch ($aVal) {
+			switch ($aVal[type]) {
 				case 3: // int
 					$aXMLDataElement->appendChild($aXMLDoc->createElement($aKey,(0+$a_row[$aKey])));
 					break;
