@@ -6,37 +6,119 @@
 <link rel='stylesheet' href='styles/main_transco_style.css' />
 <script src="./scripts/general/myAjaxLib.js"></script>
 <script>
-
-function getOneElementTable(aReference,aKey) {
+var columnsList=new Array();
+function getOneElementTable(aReference,aKey,aType) {
 	$returnStr='';
 	 xx=aReference.getElementsByTagName(aKey);
      {
-     try { $returnStr= '<td>' + xx[0].firstChild.nodeValue + '</td>'; }
-     catch (er) { $returnStr = '<td>&nbsp;</td>'; }
+     try {
+         if (aType=="") { $returnStr= xx[0].firstChild.nodeValue ; }
+         else { $returnStr= '<'+aType+'>' + xx[0].firstChild.nodeValue + '</'+aType+'>'; }
+     }catch (er) { $returnStr = '<td>&nbsp;</td>'; }
      }
      return $returnStr;
 }
 
-function getOneElementData(aReference,aKey) {
-	$returnStr='';
-	 xx=aReference.getElementsByTagName(aKey);
-     {
-     try { $returnStr= xx[0].firstChild.nodeValue ; }
-     catch (er) { $returnStr = '-?-'; }
-     }
-     return $returnStr;
+function getXMLColumnNode(aXML,aKey){
+	var columnList=new Array();
+	var aNode=aXML.getElementsByTagName(aKey);
+	var c = aNode[0].firstChild;
+	j=0;
+	while (c) {
+		if ( c.nodeType == 1) { // 1 = ELEMENT_NODE
+			columnList[j++]=c.nodeName;
+		}
+	    c = c.nextSibling;
+	}
+	return columnList;
 }
 
-function getSlaTableHeader(aPattern) {
-	  txtgetSlaTableHeader='<tr>';
-	  if (aPattern=='all' || aPattern.lastIndexOf('1')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>SLA Code</th>' };
-	  if (aPattern=='all' || aPattern.lastIndexOf('2')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Effective Date</th>' };
-	  if (aPattern=='all' || aPattern.lastIndexOf('3')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Serial</th>' };
-	  if (aPattern=='all' || aPattern.lastIndexOf('4')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Est Actif</th>' };
-	  if (aPattern=='all' || aPattern.lastIndexOf('5')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Nom Français</th>' };
-	  if (aPattern=='all' || aPattern.lastIndexOf('6')>=0) { txtgetSlaTableHeader=txtgetSlaTableHeader+'<th>Nom Anglais</th>' };
-	  txtgetSlaTableHeader=txtgetSlaTableHeader+'</tr>';
-	  return txtgetSlaTableHeader;
+function createTable(aDivId,aTableId,aColumnsList) {
+    
+    var myTableDiv = document.getElementById(aDivId);
+     
+    var table = document.createElement('table');
+    table.border='1';
+    table.id=aTableId;
+    
+    var tableHead = document.createElement('thead');
+    table.appendChild(tableHead);
+      
+    var tr = document.createElement('tr');
+    tableHead.appendChild(tr);
+       
+    for (var i=0; i<aColumnsList.length; i++){
+		var th = document.createElement('th');
+        th.appendChild(document.createTextNode(aColumnsList[i]));
+        tr.appendChild(th);
+       }
+    myTableDiv.appendChild(table);  
+}
+
+function makeReadTable(XMLData,divId,tableId) {
+
+ 	//var columnsList=getXMLNodeList(getXMLColumnNode(XMLData));
+ 	var columnsList=getXMLColumnNode(XMLData,'columns');
+	createTable(divId,tableId,columnsList);
+	
+	var tableRead = document.getElementById(tableID);
+    var rowCount = tableRead.rows.length;
+    var row = table.insertRow(1);
+    var colCount = table.rows[0].cells.length;
+
+    for(var i=0; i<colCount; i++) {
+        var newcell = row.insertCell(i);
+
+        newcell.innerHTML = table.rows[0].cells[i].innerHTML;
+        //alert(newcell.childNodes);
+        switch(newcell.childNodes[0].type) {
+            case "text":
+                    newcell.childNodes[0].value = "";
+                    break;
+            case "checkbox":
+                    newcell.childNodes[0].checked = false;
+                    break;
+            case "select-one":
+                    newcell.childNodes[0].selectedIndex = 0;
+                    break;
+        }
+    }
+}
+
+function dotable(responseXML) {
+	{
+		//makeReadTable(responseXML.documentElement.getElementsByTagName('columns'),'slaReadDef','slaRead');
+		makeReadTable(responseXML,'slaReadDef','slaRead');
+		
+		xSlaDailyData=responseXML.documentElement.getElementsByTagName('sla');
+		txtGetSlaDailyData='<table id="slaTableData" border="1">';
+		txtGetSlaDailyData=txtGetSlaDailyData+getTableHeader('all');
+		for (i=0;i<xSlaDailyData.length;i++) {
+			txtGetSlaDailyData=txtGetSlaDailyData + '<tr>';
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'idSla','');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'effdt','');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'serial','');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'isUsed','');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'slaNameFR','');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'slaNameUK','');
+			txtGetSlaDailyData=txtGetSlaDailyData + '</tr>';
+		}
+		txtGetSlaDailyData=txtGetSlaDailyData + '</table>';
+		document.getElementById('effdt').value=getOneXMLElement(xSlaDailyData[0],'effdt','');
+		document.getElementById('slaInfoTbl').innerHTML=txtGetSlaDailyData;
+	}
+}
+
+function getTableHeader(aPattern) {
+	  txtgetTableHeader='<tr>';
+	  if (aPattern=='all' || aPattern.lastIndexOf('1')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>SLA Code</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('2')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Effective Date</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('3')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Serial</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('4')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Est Actif</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('5')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Nom Français</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('6')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Nom Anglais</th>' };
+	  txtgetTableHeader=txtgetTableHeader+'</tr>';
+	  return txtgetTableHeader;
 }
 
 function slaDoAction(aDate,aNavigate,aAction) {
@@ -69,26 +151,17 @@ function getSlaDailyData(aDate,aNavigate,callback) {
 	requestServer(urlSlaDailyData,"GET",true,callback);
 }
 
-function dotable(responseXML) {
-	{
-		xSlaDailyData=responseXML.documentElement.getElementsByTagName('sla');
-		txtGetSlaDailyData='<table id="slaTableData" border="1">';
-		txtGetSlaDailyData=txtGetSlaDailyData+getSlaTableHeader('all');
-		for (i=0;i<xSlaDailyData.length;i++) {
-			txtGetSlaDailyData=txtGetSlaDailyData + '<tr>';
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'idSla');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'effdt');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'serial');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'isUsed');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameFR');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameUK');
-			txtGetSlaDailyData=txtGetSlaDailyData + '</tr>';
-		}
-		txtGetSlaDailyData=txtGetSlaDailyData + '</table>';
-		document.getElementById('effdt').value=getOneElementData(xSlaDailyData[0],'effdt');
-		document.getElementById('slaInfoTbl').innerHTML=txtGetSlaDailyData;
-	}
+function CleanTable(tableID) {
+    try {
+	    var table = document.getElementById(tableID);
+	    var rowCount = table.rows.length;
+	
+	    for(var i=0; i<rowCount; i++) { table.deleteRow(i);
+	    }
+    }catch(e) { alert(e);
+    }
 }
+
 function upDateSla (aDate,aNavigate) {
 	var urlUpdateSla='./scripts/sla/getSlaDailyData.php?effdt="'+aDate+'"&nav="'+aNavigate+'"';
 	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
@@ -110,11 +183,11 @@ function upDateSla (aDate,aNavigate) {
 			txtUpdateSla='<form methode="POST">';
 			txtUpdateSla=txtUpdateSla+"<br><br>"
 			tableUpdateSla='<table id="slaTableCRUD" border="1">'
-			tableUpdateSla=tableUpdateSla+getSlaTableHeader('1456'); 
+			tableUpdateSla=tableUpdateSla+getTableHeader('1456'); 
 			for (i=0;i<xUpdateSla.length;i++) {
 				tableUpdateSla=tableUpdateSla+'<tr>';
-				tableUpdateSla=tableUpdateSla+getOneElementTable(xUpdateSla[i],'idSla');
-				if (getOneElementData(xUpdateSla[i],'isUsed')==0) {
+				tableUpdateSla=tableUpdateSla+getOneXMLElement(xUpdateSla[i],'idSla','');
+				if (getOneXMLElement(xUpdateSla[i],'isUsed','')==0) {
 					tableUpdateSla=tableUpdateSla
 						+'<td>'
 						+'<select id="isUsed'+(i+1)+'" name="isUsed'+(i+1)+'" required>'
@@ -132,8 +205,8 @@ function upDateSla (aDate,aNavigate) {
 					+'</select>'
 					+'</td>'; // is_used  
 				}
-				tableUpdateSla=tableUpdateSla+'<td><input id="frenshName'+(i+1)+'" name="frenshName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'slaNameFR')+'" /></td>'; // sla_name_fr 
-				tableUpdateSla=tableUpdateSla+'<td><input id="englishName'+(i+1)+'" name="englishName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'slaNameUK')+'" /></td>'; //sla_name_uk 
+				tableUpdateSla=tableUpdateSla+'<td><input id="frenshName'+(i+1)+'" name="frenshName'+(i+1)+'" required value="'+getOneXMLElement(xUpdateSla[i],'slaNameFR','')+'" /></td>'; // sla_name_fr 
+				tableUpdateSla=tableUpdateSla+'<td><input id="englishName'+(i+1)+'" name="englishName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'slaNameUK','')+'" /></td>'; //sla_name_uk 
 				tableUpdateSla=tableUpdateSla+'</tr>';
 			}
 			tableUpdateSla=tableUpdateSla + '</table><br>';
@@ -146,7 +219,6 @@ function upDateSla (aDate,aNavigate) {
 	}
 	xmlhttpUpdateSla.open('GET',urlUpdateSla,true);
 	xmlhttpUpdateSla.send();
-
 }
 
 function getSlaTableAsXML(elementId) {
@@ -191,6 +263,9 @@ function addSlaTableaRow(elementId) {
 <div id='variables'>
 <input type='hidden' name='slaAction' id='slaAction' value='select'/>
 </div>
+<div id='slaReadDef' style='display: none;'></div>
+<div id='slaWriteDef'></div>
+
 <textarea id='tutu' name='tutu' rows='3' cols='30' > 
    Texte affiché dans la balise textarea en tttttt
 </textarea>
