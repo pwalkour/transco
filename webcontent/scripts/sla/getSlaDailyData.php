@@ -1,5 +1,5 @@
 <?php
-    include "../general/sqlTools.php";
+    include "../general/mySqlTools.php";
 	$effdt="";
 	$nav="";
 	$effdt=$_GET["effdt"];

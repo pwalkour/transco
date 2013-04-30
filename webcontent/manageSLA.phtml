@@ -5,63 +5,23 @@
 <title>Transco : ajouter une sla</title>
 <link rel='stylesheet' href='styles/main_transco_style.css' />
 <script src="./scripts/general/myAjaxLib.js"></script>
+<script src="./scripts/general/myTableLib.js"></script>
+<script src="./scripts/general/myXMLLib.js"></script>
+<script src="./scripts/general/mySqlTools.php"></script>
 <script>
 var columnsList=new Array();
-function getOneElementTable(aReference,aKey,aType) {
-	$returnStr='';
-	 xx=aReference.getElementsByTagName(aKey);
-     {
-     try {
-         if (aType=="") { $returnStr= xx[0].firstChild.nodeValue ; }
-         else { $returnStr= '<'+aType+'>' + xx[0].firstChild.nodeValue + '</'+aType+'>'; }
-     }catch (er) { $returnStr = '<td>&nbsp;</td>'; }
-     }
-     return $returnStr;
-}
+var columnsTitle=new Array();
+var columnsType=new Array();
+var columnsOrder=new Array();
 
-function getXMLColumnNode(aXML,aKey){
-	var columnList=new Array();
-	var aNode=aXML.getElementsByTagName(aKey);
-	var c = aNode[0].firstChild;
-	j=0;
-	while (c) {
-		if ( c.nodeType == 1) { // 1 = ELEMENT_NODE
-			columnList[j++]=c.nodeName;
-		}
-	    c = c.nextSibling;
-	}
-	return columnList;
+function initPage(){
+	
 }
-
-function createTable(aDivId,aTableId,aColumnsList) {
-    
-    var myTableDiv = document.getElementById(aDivId);
-     
-    var table = document.createElement('table');
-    table.border='1';
-    table.id=aTableId;
-    
-    var tableHead = document.createElement('thead');
-    table.appendChild(tableHead);
-      
-    var tr = document.createElement('tr');
-    tableHead.appendChild(tr);
-       
-    for (var i=0; i<aColumnsList.length; i++){
-		var th = document.createElement('th');
-        th.appendChild(document.createTextNode(aColumnsList[i]));
-        tr.appendChild(th);
-       }
-    myTableDiv.appendChild(table);  
-}
-
 function makeReadTable(XMLData,divId,tableId) {
-
- 	//var columnsList=getXMLNodeList(getXMLColumnNode(XMLData));
- 	var columnsList=getXMLColumnNode(XMLData,'columns');
+ 	getXMLColumnNode2(XMLData,'columns',columnsList,columnsType,columnsOrder);
 	createTable(divId,tableId,columnsList);
 	
-	var tableRead = document.getElementById(tableID);
+	var tableRead = document.getElementById(tableId);
     var rowCount = tableRead.rows.length;
     var row = table.insertRow(1);
     var colCount = table.rows[0].cells.length;
@@ -85,7 +45,7 @@ function makeReadTable(XMLData,divId,tableId) {
     }
 }
 
-function dotable(responseXML) {
+function doSalTable(responseXML) {
 	{
 		//makeReadTable(responseXML.documentElement.getElementsByTagName('columns'),'slaReadDef','slaRead');
 		makeReadTable(responseXML,'slaReadDef','slaRead');
@@ -95,16 +55,16 @@ function dotable(responseXML) {
 		txtGetSlaDailyData=txtGetSlaDailyData+getTableHeader('all');
 		for (i=0;i<xSlaDailyData.length;i++) {
 			txtGetSlaDailyData=txtGetSlaDailyData + '<tr>';
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'idSla','');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'effdt','');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'serial','');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'isUsed','');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'slaNameFR','');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneXMLElement(xSlaDailyData[i],'slaNameUK','');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'idSla','td');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'effdt','td');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'serial','td');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'isUsed','td');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameFR','td');
+			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameUK','td');
 			txtGetSlaDailyData=txtGetSlaDailyData + '</tr>';
 		}
 		txtGetSlaDailyData=txtGetSlaDailyData + '</table>';
-		document.getElementById('effdt').value=getOneXMLElement(xSlaDailyData[0],'effdt','');
+		document.getElementById('effdt').value=getOneElementTable(xSlaDailyData[0],'effdt','');
 		document.getElementById('slaInfoTbl').innerHTML=txtGetSlaDailyData;
 	}
 }
@@ -122,11 +82,11 @@ function getTableHeader(aPattern) {
 }
 
 function slaDoAction(aDate,aNavigate,aAction) {
-	
+	//if(columnsName.length==0) {
 	switch(aAction) {
 		case 'select':
 			document.getElementById('slaAction').value='select';
-			getSlaDailyData(aDate,aNavigate,dotable);
+			getSlaDailyData(aDate,aNavigate,doSalTable);
 			break;
 		case 'update':
 			document.getElementById('slaAction').value='update';
@@ -144,6 +104,12 @@ function slaDoAction(aDate,aNavigate,aAction) {
 	}
 }
 
+function getColumnsTitles(aTableName,callback) {
+		var urlData="./scripts/general/getColumnsTitles.php?aTableName='"+aTableName+"'";
+		document.getElementById('tutu').value=urlSlaDailyData;
+		requestServer(urlSlaDailyData,"GET",true,callback);
+}
+		
 function getSlaDailyData(aDate,aNavigate,callback) {
 
 	var urlSlaDailyData="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
