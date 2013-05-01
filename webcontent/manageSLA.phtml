@@ -14,22 +14,28 @@ var columnsTitle=new Array();
 var columnsType=new Array();
 var columnsOrder=new Array();
 
-function initPage(){
-	
-}
+function initSLA () {
+	getColumnsTitles('sla',makeSlaTitleList)
+};
+
+function makeSlaTitleList(responseXML) {
+	makeTitleList(responseXML,columnsTitle);
+};
 function makeReadTable(XMLData,divId,tableId) {
- 	getXMLColumnNode2(XMLData,'columns',columnsList,columnsType,columnsOrder);
-	createTable(divId,tableId,columnsList);
+	if(columnsList.length==0) {
+		getXMLColumnNode2(XMLData,'columns',columnsList,columnsType,columnsOrder); }
+
+	createTable(divId,tableId,columnsList,columnsTitle);
 	
 	var tableRead = document.getElementById(tableId);
     var rowCount = tableRead.rows.length;
-    var row = table.insertRow(1);
-    var colCount = table.rows[0].cells.length;
+    var row = tableRead.insertRow(1);
+    var colCount = tableRead.rows[0].cells.length;
 
     for(var i=0; i<colCount; i++) {
         var newcell = row.insertCell(i);
 
-        newcell.innerHTML = table.rows[0].cells[i].innerHTML;
+        newcell.innerHTML = tableRead.rows[0].cells[i].innerHTML;
         //alert(newcell.childNodes);
         switch(newcell.childNodes[0].type) {
             case "text":
@@ -102,12 +108,6 @@ function slaDoAction(aDate,aNavigate,aAction) {
 		case 'delete':
 			break;
 	}
-}
-
-function getColumnsTitles(aTableName,callback) {
-		var urlData="./scripts/general/getColumnsTitles.php?aTableName='"+aTableName+"'";
-		document.getElementById('tutu').value=urlSlaDailyData;
-		requestServer(urlSlaDailyData,"GET",true,callback);
 }
 		
 function getSlaDailyData(aDate,aNavigate,callback) {
@@ -225,7 +225,7 @@ function addSlaTableaRow(elementId) {
 </script>
 
 </head>
-<body>
+<body onload='initSLA()'>
 <div id='variables'>
 <input type='hidden' name='slaAction' id='slaAction' value='select'/>
 </div>

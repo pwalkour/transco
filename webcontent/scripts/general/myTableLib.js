@@ -1,5 +1,5 @@
 
-function createTable(aDivId,aTableId,aColumnsList) {
+function createTable(aDivId,aTableId,aColumnsList,aColumnsTitle) {
     
     var myTableDiv = document.getElementById(aDivId);
      
@@ -15,8 +15,21 @@ function createTable(aDivId,aTableId,aColumnsList) {
        
     for (var i=0; i<aColumnsList.length; i++){
 		var th = document.createElement('th');
-        th.appendChild(document.createTextNode(aColumnsList[i]));
+        th.appendChild(document.createTextNode(aColumnsTitle[aColumnsList[i]]));
         tr.appendChild(th);
        }
     myTableDiv.appendChild(table);  
 }
+
+function getColumnsTitles(aTableName,callback) {
+	var urlData="/transco/webcontent/scripts/general/getColumnsTitles.php?aTable='"+aTableName+"'";
+	requestServer(urlData,"GET",true,callback);
+}
+ 
+function makeTitleList(aResponseXML,aColumnsTitle) {
+	var aNode=aResponseXML.getElementsByTagName('columnsName');
+	for (i=0;i<aNode.length;i++) {
+		aKey=getOneElementTable(aNode[i],'filedName','');
+		aColumnsTitle[aKey]=getOneElementTable(aNode[i],'titleName','');
+	}
+};

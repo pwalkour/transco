@@ -20,7 +20,8 @@ function requestServer(aURL,aMode,aSync,callback) {
 	else { XMLHTTPObject=new ActiveXObject('Microsoft.XMLHTTP'); } // code for IE6, IE5 	
 	
 	XMLHTTPObject.onreadystatechange=function() {
-		if (XMLHTTPObject.readyState==4 && XMLHTTPObject.status==200) { callback(XMLHTTPObject.responseXML); }
+		if (XMLHTTPObject.readyState==4 && XMLHTTPObject.status==200) { 
+			callback(XMLHTTPObject.responseXML); }
 	}
 	XMLHTTPObject.open(aMode,aURL,aSync);
 	XMLHTTPObject.send();
