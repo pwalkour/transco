@@ -18,64 +18,42 @@ function initSLA () {
 	getColumnsTitles('sla',makeSlaTitleList)
 };
 
-function makeSlaTitleList(responseXML) {
-	makeTitleList(responseXML,columnsTitle);
+function makeSlaTitleList(responseXMLTitle) {
+	makeTitleList(responseXMLTitle,columnsTitle);
 };
+
 function makeReadTable(XMLData,divId,tableId) {
 	if(columnsList.length==0) {
-		getXMLColumnNode2(XMLData,'columns',columnsList,columnsType,columnsOrder); }
-
-	createTable(divId,tableId,columnsList,columnsTitle);
-	
-	var tableRead = document.getElementById(tableId);
-    var rowCount = tableRead.rows.length;
-    var row = tableRead.insertRow(1);
-    var colCount = tableRead.rows[0].cells.length;
-
-    for(var i=0; i<colCount; i++) {
-        var newcell = row.insertCell(i);
-
-        newcell.innerHTML = tableRead.rows[0].cells[i].innerHTML;
-        //alert(newcell.childNodes);
-        switch(newcell.childNodes[0].type) {
-            case "text":
-                    newcell.childNodes[0].value = "";
-                    break;
-            case "checkbox":
-                    newcell.childNodes[0].checked = false;
-                    break;
-            case "select-one":
-                    newcell.childNodes[0].selectedIndex = 0;
-                    break;
-        }
+		getXMLColumnNode2(XMLData,'columns',columnsList,columnsType,columnsOrder); 
+		createTable(divId,tableId,columnsList,columnsTitle);        
     }
 }
 
-function doSalTable(responseXML) {
-	{
-		//makeReadTable(responseXML.documentElement.getElementsByTagName('columns'),'slaReadDef','slaRead');
-		makeReadTable(responseXML,'slaReadDef','slaRead');
-		
-		xSlaDailyData=responseXML.documentElement.getElementsByTagName('sla');
-		txtGetSlaDailyData='<table id="slaTableData" border="1">';
-		txtGetSlaDailyData=txtGetSlaDailyData+getTableHeader('all');
-		for (i=0;i<xSlaDailyData.length;i++) {
-			txtGetSlaDailyData=txtGetSlaDailyData + '<tr>';
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'idSla','td');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'effdt','td');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'serial','td');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'isUsed','td');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameFR','td');
-			txtGetSlaDailyData=txtGetSlaDailyData+getOneElementTable(xSlaDailyData[i],'slaNameUK','td');
-			txtGetSlaDailyData=txtGetSlaDailyData + '</tr>';
-		}
-		txtGetSlaDailyData=txtGetSlaDailyData + '</table>';
-		document.getElementById('effdt').value=getOneElementTable(xSlaDailyData[0],'effdt','');
-		document.getElementById('slaInfoTbl').innerHTML=txtGetSlaDailyData;
+function doSalTable(responseXMLData) {
+	var slaDivRefId='slaInfoTbl';
+	var slaSelectTableId='slaRead';
+	var div = document.getElementById(slaDivRefId);
+
+	makeReadTable(responseXMLData,slaDivRefId,slaSelectTableId);
+	var tableRead = document.getElementById(slaSelectTableId);
+	var rowCount = tableRead.rows.length -1;
+	for (h=rowCount;h>0;h--){
+		tableRead.deleteRow(h);
 	}
+	xSlaDailyData=responseXMLData.documentElement.getElementsByTagName('sla');
+	for (i=0;i<xSlaDailyData.length;i++) {
+	    var rowCount = tableRead.rows.length;
+	    var row = tableRead.insertRow(rowCount);
+	    var colCount = tableRead.rows[0].cells.length;
+	    for(var j=0; j<colCount; j++) {
+	        var newcell = row.insertCell(j);
+	        newcell.innerHTML=getOneElementTable(xSlaDailyData[i],columnsList[j],'');;
+	    }
+	}
+	document.getElementById('effdt').value=getOneElementTable(xSlaDailyData[0],'effdt','');
 }
 
-function getTableHeader(aPattern) {
+function ZZZgetTableHeader(aPattern) {
 	  txtgetTableHeader='<tr>';
 	  if (aPattern=='all' || aPattern.lastIndexOf('1')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>SLA Code</th>' };
 	  if (aPattern=='all' || aPattern.lastIndexOf('2')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Effective Date</th>' };
@@ -115,17 +93,6 @@ function getSlaDailyData(aDate,aNavigate,callback) {
 	var urlSlaDailyData="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
 	document.getElementById('tutu').value=urlSlaDailyData;
 	requestServer(urlSlaDailyData,"GET",true,callback);
-}
-
-function CleanTable(tableID) {
-    try {
-	    var table = document.getElementById(tableID);
-	    var rowCount = table.rows.length;
-	
-	    for(var i=0; i<rowCount; i++) { table.deleteRow(i);
-	    }
-    }catch(e) { alert(e);
-    }
 }
 
 function upDateSla (aDate,aNavigate) {

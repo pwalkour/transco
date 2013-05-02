@@ -10,6 +10,17 @@ function getOneElementTable(aReference,aKey,aType) {
      return $returnStr;
 }
 
+function getOneElement(aReference,aKey,aType) {
+	$returnStr='';
+	// xx=aReference.getElementsByTagName(aKey);
+     {
+     try {
+         if (aType=="") { $returnStr= aReference.firstChild.nodeValue ; }
+         else { $returnStr= '<'+aType+'>' + aReference.firstChild.nodeValue + '</'+aType+'>'; }
+     }catch (er) { $returnStr = '<td>&nbsp;</td>'; }
+     }
+     return $returnStr;
+}
 function getXMLColumnNode(aXML,aKey,aColumnsType,aColumnsOrder){
 	var columnList=new Array();
 	var aNode=aXML.getElementsByTagName(aKey);

@@ -1,3 +1,13 @@
+function CleanTable(tableID) {
+    try {
+	    var table = document.getElementById(tableID);
+	    var rowCount = table.rows.length;
+	
+	    for(var i=0; i<rowCount; i++) { table.deleteRow(i);
+	    }
+    }catch(e) { alert(e);
+    }
+}
 
 function createTable(aDivId,aTableId,aColumnsList,aColumnsTitle) {
     
