@@ -23,23 +23,33 @@ function getColumnsArray($result) {
 	return $columns;
 }
 
-function buildXML($xmlMainChild,$request) {
-	$columnsArrayNames=array();
-	$columnList="";
-	$columnType="";
-	$ColumnPosition="";
-	$separator="";
-	
+function doSqlQuery($request) {
+
 	$mysqli=initConnection();
 	if ($mysqli->connect_errno) { echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
 	}
 
 	if (!($res=$mysqli->query($request, MYSQLI_STORE_RESULT))) { echo "call procedure failed: (" . $mysqli->errno . ") " . $mysqli->error;
 	}
-	
+
+	return $res;
+}
+
+function doSqlInsUpd($request) {
+
+	$mysqli=initConnection();
+	if ($mysqli->connect_errno) { echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+	}
+
+	$mysqli->query($request);
+	$mysqli_close($con);
+}
+
+function buildXMLOutput ($xmlMainChild,$res) {
+	$columnsArrayNames=array();
 	//create the root element
 	//create the xml document
-	$aXMLDoc = new DOMDocument();
+	$aXMLDoc = new DOMDocument('1.0', 'UTF-8');
 	$aXMLRoot = $aXMLDoc->appendChild($aXMLDoc->createElement($xmlMainChild."s"));
 	$aXMLDataElement = $aXMLRoot->appendChild($aXMLDoc->createElement("columns"));
 
@@ -70,7 +80,9 @@ function buildXML($xmlMainChild,$request) {
 		}
 	}
 	// print response to stdout
-	header('Content-Type: text/xml');
+	//header('Content-Type: text/xml');
+	header('Content-Type: text/xml; charset=UTF-8');
+	//echo "<?xml version=\"1.0\" encoding=\"utf-8\"";
 	$aXMLDoc->formatOutput = true;
 	echo $aXMLDoc->saveXML();
 }

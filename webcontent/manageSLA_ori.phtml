@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang='fr'>
+<head>
+<meta charset='utf-8' />
+<title>Transco : ajouter une sla</title>
+<link rel='stylesheet' href='styles/main_transco_style.css' />
+<script src="./scripts/general/myAjaxLib.js"></script>
+<script src="./scripts/general/myTableLib.js"></script>
+<script src="./scripts/general/myXMLLib.js"></script>
+<script src="./scripts/general/mySqlTools.php"></script>
+<script>
+var columnsList=new Array();
+var columnsTitle=new Array();
+var columnsType=new Array();
+var columnsOrder=new Array();
+
+function initSLA () {
+	getColumnsTitles('sla',makeSlaTitleList)
+};
+
+function makeSlaTitleList(responseXMLTitle) {
+	makeTitleList(responseXMLTitle,columnsTitle);
+};
+
+function makeReadTable(XMLData,divId,tableId) {
+	if(columnsList.length==0) {
+		getXMLColumnNode(XMLData,'columns',columnsList,columnsType,columnsOrder); 
+		createTable(divId,tableId,columnsList,columnsTitle);        
+    }
+}
+
+function doSalTable(responseXMLData) {
+	var slaDivRefId='slaInfoTbl';
+	var slaSelectTableId='slaRead';
+	var div = document.getElementById(slaDivRefId);
+
+	makeReadTable(responseXMLData,slaDivRefId,slaSelectTableId);
+	var tableRead = document.getElementById(slaSelectTableId);
+	var rowCount = tableRead.rows.length -1;
+	for (h=rowCount;h>0;h--){
+		tableRead.deleteRow(h);
+	}
+	xSlaDailyData=responseXMLData.documentElement.getElementsByTagName('sla');
+	for (i=0;i<xSlaDailyData.length;i++) {
+	    var rowCount = tableRead.rows.length;
+	    var row = tableRead.insertRow(rowCount);
+	    var colCount = tableRead.rows[0].cells.length;
+	    for(var j=0; j<colCount; j++) {
+	        var newcell = row.insertCell(j);
+	        newcell.innerHTML=getOneElementTable(xSlaDailyData[i],columnsList[j],'');;
+	    }
+	}
+	document.getElementById('effdt').value=getOneElementTable(xSlaDailyData[0],'effdt','');
+}
+
+function ZZZgetTableHeader(aPattern) {
+	  txtgetTableHeader='<tr>';
+	  if (aPattern=='all' || aPattern.lastIndexOf('1')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>SLA Code</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('2')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Effective Date</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('3')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Serial</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('4')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Est Actif</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('5')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Nom Français</th>' };
+	  if (aPattern=='all' || aPattern.lastIndexOf('6')>=0) { txtgetTableHeader=txtgetTableHeader+'<th>Nom Anglais</th>' };
+	  txtgetTableHeader=txtgetTableHeader+'</tr>';
+	  return txtgetTableHeader;
+}
+
+function slaDoAction(aDate,aNavigate,aAction) {
+	//if(columnsName.length==0) {
+	switch(aAction) {
+		case 'select':
+			document.getElementById('slaAction').value='select';
+			getSlaDailyData(aDate,aNavigate,doSalTable);
+			break;
+		case 'update':
+			document.getElementById('slaAction').value='update';
+			upDateSla (aDate,aNavigate);
+			break;
+		case 'write':
+			tableAsXML=getSlaTableAsXML('slaTableCRUD');
+			break;
+		case 'add':
+			slaDoAction(aDate,aNavigate,'write');
+			a=1;
+			break;
+		case 'delete': 
+			break;
+	}
+}
+		
+function getSlaDailyData(aDate,aNavigate,callback) {
+
+	var urlSlaDailyData="./scripts/sla/getSlaDailyData.php?effdt='"+aDate+"'&nav='"+aNavigate+"'";
+	document.getElementById('tutu').value=urlSlaDailyData;
+	requestServer(urlSlaDailyData,"GET",true,callback);
+}
+
+function upDateSla (aDate,aNavigate) {
+	var urlUpdateSla='./scripts/sla/getSlaDailyData.php?effdt="'+aDate+'"&nav="'+aNavigate+'"';
+	//var url="getSlaDailyData2.php?effdt='2013-01-28'"; 
+	var xmlhttpUpdateSla;
+	var xUpdateSla,name_fr,name_uk,is_used;
+	document.getElementById('tutu').value=urlUpdateSla;
+	//alert(aDate);
+	
+	if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari 
+		xmlhttpUpdateSla=new XMLHttpRequest();
+	}
+	else {// code for IE6, IE5 
+		xmlhttpUpdateSla=new ActiveXObject('Microsoft.XMLHTTP');
+	}
+	
+	xmlhttpUpdateSla.onreadystatechange=function() {
+		if (xmlhttpUpdateSla.readyState==4 && xmlhttpUpdateSla.status==200) {
+			xUpdateSla=xmlhttpUpdateSla.responseXML.documentElement.getElementsByTagName('sla');
+			txtUpdateSla='<form methode="POST">';
+			txtUpdateSla=txtUpdateSla+"<br><br>"
+			tableUpdateSla='<table id="slaTableCRUD" border="1">'
+			tableUpdateSla=tableUpdateSla+getTableHeader('1456'); 
+			for (i=0;i<xUpdateSla.length;i++) {
+				tableUpdateSla=tableUpdateSla+'<tr>';
+				tableUpdateSla=tableUpdateSla+getOneXMLElement(xUpdateSla[i],'idSla','');
+				if (getOneXMLElement(xUpdateSla[i],'isUsed','')==0) {
+					tableUpdateSla=tableUpdateSla
+						+'<td>'
+						+'<select id="isUsed'+(i+1)+'" name="isUsed'+(i+1)+'" required>'
+						+'<option value="0" selected> Inactif</option>'
+						+'<option value="1" > Actif</option>'
+						+'</select>'
+						+'</td>'; // is_used 
+				}
+				else {
+					tableUpdateSla=tableUpdateSla
+					+'<td>'
+					+'<select id="isUsed'+(i+1)+'" name="isUsed'+(i+1)+'" required>'
+					+'<option value="0" > Inactif</option>'
+					+'<option value="1" selected> Actif</option>'
+					+'</select>'
+					+'</td>'; // is_used  
+				}
+				tableUpdateSla=tableUpdateSla+'<td><input id="frenshName'+(i+1)+'" name="frenshName'+(i+1)+'" required value="'+getOneXMLElement(xUpdateSla[i],'slaNameFR','')+'" /></td>'; // sla_name_fr 
+				tableUpdateSla=tableUpdateSla+'<td><input id="englishName'+(i+1)+'" name="englishName'+(i+1)+'" required value="'+getOneElementData(xUpdateSla[i],'slaNameUK','')+'" /></td>'; //sla_name_uk 
+				tableUpdateSla=tableUpdateSla+'</tr>';
+			}
+			tableUpdateSla=tableUpdateSla + '</table><br>';
+			txtUpdateSla=txtUpdateSla + tableUpdateSla
+			txtUpdateSla=txtUpdateSla + '<div id="slaAdd"><input type="button" value="Ajouter un nouveau" onclick="slaDoAction(document.getElementById (\'effdt\').value,\'current\',\'add\')\" /></div>';
+			txtUpdateSla=txtUpdateSla + '<div id="slaWrite"><input type="button" value="Ecrire" onclick="slaDoAction(document.getElementById (\'effdt\').value,\'current\',\'write\')\" /></div>';
+			txtUpdateSla=txtUpdateSla + '</form>';
+			document.getElementById('slaInfoTbl').innerHTML=txtUpdateSla;
+		}
+	}
+	xmlhttpUpdateSla.open('GET',urlUpdateSla,true);
+	xmlhttpUpdateSla.send();
+}
+
+function getSlaTableAsXML(elementId) {
+	table = document.getElementById( elementId );
+	var salXMLDataToInsert="";
+	salXMLDataToInsert="<slas>";
+	 
+	for ( i = 1; i < table.rows.length; i++ ) {
+    	salXMLDataToInsert=salXMLDataToInsert+"<sla>";
+    	salXMLDataToInsert=salXMLDataToInsert+"<idSla>"+table.rows[i].cells[0].innerHTML+"</idSla>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<isUsed>"+document.getElementById( 'isUsed'+i ).value+"</isUsed>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<slaNameFR>"+document.getElementById( 'frenshName'+i ).value+"</slaNameFR>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<slaNameUK>"+document.getElementById( 'englishName'+i ).value+"</slaNameUK>"
+    	salXMLDataToInsert=salXMLDataToInsert+"</sla>"
+	}
+	salXMLDataToInsert=salXMLDataToInsert+"</slas>";
+    return loadXMLString(salXMLDataToInsert);
+}
+
+function addSlaTableaRow(elementId) {
+	table = document.getElementById( elementId );
+	var salXMLDataToInsert="";
+	salXMLDataToInsert="<slas>";
+	 
+	for ( i = 1; i < table.rows.length; i++ ) {
+    	salXMLDataToInsert=salXMLDataToInsert+"<sla>";
+    	salXMLDataToInsert=salXMLDataToInsert+"<idSla>"+table.rows[i].cells[0].innerHTML+"</idSla>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<isUsed>"+document.getElementById( 'isUsed'+i ).value+"</isUsed>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<slaNameFR>"+document.getElementById( 'frenshName'+i ).value+"</slaNameFR>"
+    	salXMLDataToInsert=salXMLDataToInsert+"<slaNameUK>"+document.getElementById( 'englishName'+i ).value+"</slaNameUK>"
+    	
+    	salXMLDataToInsert=salXMLDataToInsert+"</sla>"
+	}
+	salXMLDataToInsert=salXMLDataToInsert+"</slas>";
+    return loadXMLString(salXMLDataToInsert);
+}
+
+</script>
+
+</head>
+<body onload='initSLA()'>
+<div id='variables'>
+<input type='hidden' name='slaAction' id='slaAction' value='select'/>
+</div>
+<div id='slaReadDef' style='display: none;'></div>
+<div id='slaWriteDef'></div>
+
+<textarea id='tutu' name='tutu' rows='3' cols='30' > 
+   Texte affiché dans la balise textarea en tttttt
+</textarea>
+<br>
+<div id='SlaSelectDate'>
+quel est l'effective date : <input id='effdt' name='effdt' autofocus type='date' onblur='slaDoAction(this.value,"current",document.getElementById("slaAction").value)' /><br>
+</div>
+
+<div id='Previous'>
+	<input type='button' value='SLA précédente' onclick='slaDoAction(document.getElementById("effdt").value,"previous",document.getElementById("slaAction").value)' />
+</div>
+<div id='slaEdit'>
+	<input type='button' value='SLA edition' onclick='slaDoAction(document.getElementById("effdt").value,"current","update")' />
+</div>
+<div id='slaNext'>
+	<input type='button' value='SLA suivante' onclick='slaDoAction(document.getElementById("effdt").value,"next",document.getElementById("slaAction").value)' />
+</div>
+
+<div id='slaInfoTbl'>
+</div>
+
+</body>
+</html>
+
+
+

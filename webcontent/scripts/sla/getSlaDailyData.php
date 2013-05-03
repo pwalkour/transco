@@ -7,7 +7,7 @@
 	$request= "call slaGetHistoData(".$effdt.",".$nav.");";
 	$xmlMainChild="sla";
 	
-	buildXML($xmlMainChild,$request);
-	
+	$reponse=doSqlQuery($request);
+	buildXMLOutput($xmlMainChild,$reponse);
 ?>
 

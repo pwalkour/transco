@@ -21,22 +21,8 @@ function getOneElement(aReference,aKey,aType) {
      }
      return $returnStr;
 }
-function getXMLColumnNode(aXML,aKey,aColumnsType,aColumnsOrder){
-	var columnList=new Array();
-	var aNode=aXML.getElementsByTagName(aKey);
-	var c = aNode[0].firstChild;
-	j=0;
-	while (c) {
-		if ( c.nodeType == 1) { // 1 = ELEMENT_NODE
-			columnList[j++]=c.nodeName;
-			
-		}
-	    c = c.nextSibling;
-	}
-	return columnList;
-}
 
-function getXMLColumnNode2(aXML,aKey,aColumnList,aColumnsType,aColumnsOrder){
+function getXMLColumnNode(aXML,aKey,aColumnList,aColumnsType,aColumnsOrder){
 	var aNode=aXML.getElementsByTagName(aKey);
 	var c = aNode[0].firstChild;
 	j=0;
