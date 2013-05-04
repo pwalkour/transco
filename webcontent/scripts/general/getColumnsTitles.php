@@ -4,5 +4,7 @@
 	$aTable=$_GET["aTable"];
 	$request= "call getColumnsTitles(".$aTable.");";
 	$xmlMainChild="columnsName";
-	buildXML($xmlMainChild,$request);
+	$reponse=doSqlQuery($request);
+	buildXMLOutput($xmlMainChild,$reponse);
+
 ?>
