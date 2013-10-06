@@ -1,4 +1,4 @@
-function capitaliseFirstLetter(string)
+function capitaliseFirstLetter(aString)
 {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    return aString.charAt(0).toUpperCase() + aString.slice(1);
 }

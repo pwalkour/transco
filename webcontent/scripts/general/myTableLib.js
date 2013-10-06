@@ -9,7 +9,51 @@ function CleanTable(tableID) {
     }
 }
 
-function createTable(aDivId,aTableId,aColumnsList,aColumnsTitle) {
+function createReadTable(aDivId,aTableId,aColumnsList,aColumnsTitle,aColumnsType,aPaternList) {
+    
+    var myTableDiv = document.getElementById(aDivId);
+     
+    var refTable=document.getElementById(aTableId);
+    var UpdTable = document.createElement('table');
+    UpdTable.border='1';
+   
+    
+    var tableHead = document.createElement('thead');
+    UpdTable.appendChild(tableHead);
+      
+    var tr = document.createElement('tr');
+    tableHead.appendChild(tr);
+
+    
+    
+    for (var i=-1; i<aColumnsList.length; i++){
+		var th = document.createElement('th');
+		if (i==-1) {
+			var aCheckbox = document.createElement('input');
+			aCheckbox.type = "checkbox";
+			aCheckbox.name = "Action";
+			aCheckbox.value = "value";
+			aCheckbox.id = "id";
+
+			var aLabel = document.createElement('label')
+			aLabel.htmlFor = "id";
+			aLabel.appendChild(document.createTextNode('label'));
+			
+			var aNode=document.createTextNode('Action');
+			aNode.type='checkbox';
+			th.appendChild(document.createTextNode('Action'));
+			
+		}else{
+			th.appendChild(document.createTextNode(aColumnsTitle[aColumnsList[i]]));
+		}
+        tr.appendChild(th);
+       }
+    
+   // UpdTable.id=aTableId;
+    myTableDiv.appendChild(table);  
+}
+
+function createWriteTable(aDivId,aTableId,aColumnsList,aColumnsTitle,aColumnsType,aPaternList) {
     
     var myTableDiv = document.getElementById(aDivId);
      
@@ -25,29 +69,36 @@ function createTable(aDivId,aTableId,aColumnsList,aColumnsTitle) {
        
     for (var i=0; i<aColumnsList.length; i++){
 		var th = document.createElement('th');
+		
         th.appendChild(document.createTextNode(aColumnsTitle[aColumnsList[i]]));
         tr.appendChild(th);
        }
     myTableDiv.appendChild(table);  
 }
 
-function getColumnsTitles(aTableName,callback,aArray) {
+function getColumnsTitles(aTableName,callback,aArray1,aArray2,aArray3) {
 	var urlData="/transco/webcontent/scripts/general/getColumnsTitles.php?aTable='"+aTableName+"'";
-	requestServer(urlData,"GET",true,callback,aArray);
+	requestServer(urlData,"GET",true,callback,aArray1,aArray2,aArray3);
 }
  
-function makeTitleList(aResponseXML,aColumnsTitle) {
+function makeTitleList(aResponseXML,aColumnsTitle,aColumnsSelectType,aColumnsUpdateType) {
 	var aNode=aResponseXML.getElementsByTagName('columnsName');
 	for (i=0;i<aNode.length;i++) {
 		aKey=getOneElementTable(aNode[i],'filedName','');
 		aColumnsTitle[aKey]=getOneElementTable(aNode[i],'titleName','');
+		aColumnsSelectType[aKey]=getOneElementTable(aNode[i],'selectType','');
+		aColumnsUpdateType[aKey]=getOneElementTable(aNode[i],'insertType','');
 	}
 }
 
 function makeReadTable(XMLData,divId,tableId) {
+	var columnsPattern="";
 	if(columnsList.length==0) {
-		getXMLColumnNode(XMLData,'columns',columnsList,columnsType,columnsOrder); 
-		createTable(divId,tableId,columnsList,columnsTitle);        
+		getXMLColumnNode(XMLData,'columns',columnsList,columnsType,columnsOrder);
+		for (i=0;i<columnsList.length;i++) {
+			
+		}
+		createReadTable(divId,tableId,columnsList,columnsTitle,columnsSelectType,columnsPattern);        
     }
 }
 
@@ -74,3 +125,4 @@ function doTable(responseXMLData,aType) {
 	}
 	document.getElementById('effdt').value=getOneElementTable(xDailyData[0],'effdt','');
 }
+

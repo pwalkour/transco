@@ -1,14 +1,3 @@
-function getOneElementTable(aReference,aKey,aType) {
-	$returnStr='';
-	 xx=aReference.getElementsByTagName(aKey);
-     {
-     try {
-         if (aType=="") { $returnStr= xx[0].firstChild.nodeValue ; }
-         else { $returnStr= '<'+aType+'>' + xx[0].firstChild.nodeValue + '</'+aType+'>'; }
-     }catch (er) { $returnStr = '<td>&nbsp;</td>'; }
-     }
-     return $returnStr;
-}
 
 function getOneElement(aReference,aKey,aType) {
 	$returnStr='';
